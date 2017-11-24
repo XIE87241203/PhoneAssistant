@@ -37,9 +37,16 @@ public class PhoneStateActivity extends AppCompatActivity {
     }
 
     private void initData() {
+        //注册电池广播监听
+        PhoneStateUtils.getInstance().registerBatteryBroadcast(this);
+
         data = new ArrayList<>();
         data.add(new PhoneStateInfo("总内存", PhoneStateUtils.getInstance().getTotalMemory(getApplicationContext())));
         data.add(new PhoneStateInfo("可用内存"));
+        data.add(new PhoneStateInfo("电池状态"));
+        data.add(new PhoneStateInfo("剩余电量"));
+        data.add(new PhoneStateInfo("当前电压"));
+        data.add(new PhoneStateInfo("电池温度"));
         adapter = new PhoneStateAdapter(this, data ,R.layout.item_phone_state);
         listview.setAdapter(adapter);
         uiHandler = new UIHandler(this);
@@ -50,6 +57,10 @@ public class PhoneStateActivity extends AppCompatActivity {
                 super.run();
                 while (threadSwitch) {
                     data.get(1).setValue(PhoneStateUtils.getInstance().getAvailMemory(getApplicationContext()));
+                    data.get(2).setValue(PhoneStateUtils.getInstance().getBatteryStatus());
+                    data.get(3).setValue(PhoneStateUtils.getInstance().getBattery());
+                    data.get(4).setValue(PhoneStateUtils.getInstance().getBatteryV());
+                    data.get(5).setValue(PhoneStateUtils.getInstance().getBatteryT());
                     //刷新listview
                     uiHandler.sendEmptyMessage(0);
                     try {
@@ -67,6 +78,7 @@ public class PhoneStateActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         threadSwitch = false;
+        PhoneStateUtils.getInstance().unregisterBatteryBroadcast(this);
         super.onDestroy();
     }
 
