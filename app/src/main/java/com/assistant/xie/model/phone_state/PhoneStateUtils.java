@@ -6,11 +6,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
+import android.os.Environment;
+import android.os.StatFs;
 import android.support.annotation.NonNull;
 import android.text.format.Formatter;
 import android.util.Log;
 
+import com.assistant.xie.model.main.MainActivity;
+
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -20,6 +25,10 @@ import java.io.IOException;
  */
 
 class PhoneStateUtils {
+    private static final String STRING_GET_BATTERY_STATE_FAIL = "获取失败";
+    private static final String STRING_NO_SDCARD = "未检测到内存卡";
+    private static final String STRING_NO_SDCARD_PERMISSION = "无内存卡权限，无法获取内存卡状态";
+    private boolean sdCardHasPermission = false;//是否有内存卡权限
     private static PhoneStateUtils instance;
     private String batteryState;//电池状态信息
     private MyBroadcastReceiver broadcastReceiver;//电池广播监听
@@ -80,6 +89,96 @@ class PhoneStateUtils {
     }
 
     /**
+     * 设置有无访问内存卡权限标记
+     *
+     * @param isGrant 是否具有权限
+     */
+    void setSDCardHasPermission(boolean isGrant) {
+        sdCardHasPermission = isGrant;
+    }
+
+    /**
+     * 获取内存卡存储状态
+     *
+     * @param context context
+     * @return 内存卡存储状态
+     */
+    String getSDUsageStatus(Context context) {
+        if (!sdCardHasPermission) return STRING_NO_SDCARD_PERMISSION;
+        // 判断是否有插入并挂载存储卡(通过判断设备是否能够移除来判断是否是内存卡)
+        if (Environment.isExternalStorageRemovable() && Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            return getSDAvailableSize(context) + "/" + getSDTotalSize(context);
+        } else {
+            return STRING_NO_SDCARD;
+        }
+    }
+
+    /**
+     * 获取手机内部存储状态
+     *
+     * @param context context
+     * @return 手机内部存储状态
+     */
+    String getROMUsageStatus(Context context) {
+        return getRomAvailableSize(context) + "/" + getRomTotalSize(context);
+    }
+
+    /**
+     * 获得SD卡总大小
+     *
+     * @return SD卡总大小
+     */
+    private String getSDTotalSize(Context context) {
+        File path = Environment.getExternalStorageDirectory();
+        StatFs stat = new StatFs(path.getPath());
+        long blockSize = stat.getBlockSizeLong();
+        long totalBlocks = stat.getBlockCountLong();
+        return Formatter.formatFileSize(context, blockSize * totalBlocks);
+
+    }
+
+    /**
+     * 获得sd卡剩余容量，即可用大小
+     *
+     * @return sd卡剩余容量
+     */
+    private String getSDAvailableSize(Context context) {
+        File path = Environment.getExternalStorageDirectory();
+        Log.v("testMsg", "getExternalStorageDirectory-->" + path.getPath());
+        StatFs stat = new StatFs(path.getPath());
+        long blockSize = stat.getBlockSizeLong();
+        long availableBlocks = stat.getAvailableBlocksLong();
+        return Formatter.formatFileSize(context, blockSize * availableBlocks);
+    }
+
+    /**
+     * 获得机身存储总大小
+     *
+     * @return 机身存储总大小
+     */
+    private String getRomTotalSize(Context context) {
+        File path = Environment.getDataDirectory();
+        Log.v("testMsg", "getDataDirectory-->" + path.getPath());
+        StatFs stat = new StatFs(path.getPath());
+        long blockSize = stat.getBlockSizeLong();
+        long totalBlocks = stat.getBlockCountLong();
+        return Formatter.formatFileSize(context, blockSize * totalBlocks);
+    }
+
+    /**
+     * 获得机身可用存储容量
+     *
+     * @return 机身可用存储容量
+     */
+    private String getRomAvailableSize(Context context) {
+        File path = Environment.getDataDirectory();
+        StatFs stat = new StatFs(path.getPath());
+        long blockSize = stat.getBlockSizeLong();
+        long availableBlocks = stat.getAvailableBlocksLong();
+        return Formatter.formatFileSize(context, blockSize * availableBlocks);
+    }
+
+    /**
      * 注册电池监听广播
      *
      * @param context context
@@ -112,7 +211,7 @@ class PhoneStateUtils {
         if (broadcastReceiver != null) {
             return broadcastReceiver.battery + "%";
         } else {
-            return "获取失败";
+            return STRING_GET_BATTERY_STATE_FAIL;
         }
     }
 
@@ -127,7 +226,7 @@ class PhoneStateUtils {
         if (broadcastReceiver != null) {
             return broadcastReceiver.batteryV + "mV";
         } else {
-            return "获取失败";
+            return STRING_GET_BATTERY_STATE_FAIL;
         }
     }
 
@@ -142,7 +241,7 @@ class PhoneStateUtils {
         if (broadcastReceiver != null) {
             return (broadcastReceiver.batteryT * 0.1) + "℃";
         } else {
-            return "获取失败";
+            return STRING_GET_BATTERY_STATE_FAIL;
         }
     }
 
@@ -157,7 +256,7 @@ class PhoneStateUtils {
         if (broadcastReceiver != null) {
             return broadcastReceiver.batteryStatus;
         } else {
-            return "获取失败";
+            return STRING_GET_BATTERY_STATE_FAIL;
         }
     }
 
