@@ -19,7 +19,7 @@ public abstract class ListViewBaseAdapter<T> extends BaseAdapter {
 
     public ListViewBaseAdapter(Context context, List<T> list, int layoutId) {
         this.context = context;
-        this.list = list;
+        this.list = list ;
         this.layoutId = layoutId;
     }
 
