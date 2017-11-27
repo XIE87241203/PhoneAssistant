@@ -6,11 +6,19 @@
 
     <!--手机状态页面-->
     <string name="phone_state_all_show_float_window">全部显示到悬浮窗</string>
-    <string name="phone_state_ram_static">内存状态：%s/%s</string>
+    <string name="phone_state_ram_static">内存状态：%s</string>
     <string name="phone_state_battery_static">电池状态：%s</string>
     <string name="phone_state_battery_capacity">电量：%s</string>
     <string name="phone_state_battery_voltage">当前电压：%s</string>
     <string name="phone_state_battery_temperature">电池温度：%s</string>
     <string name="phone_state_rom_state">手机存储状态：%s</string>
     <string name="phone_state_sdcard_rom_state">内存卡存储状态：%s</string>
+    <!--手机状态悬浮窗-->
+    <string name="phone_state_float_ram_static">RAM：%s</string>
+    <string name="phone_state_float_battery_static">电池状态：%s</string>
+    <string name="phone_state_float_battery_capacity">电量：%s</string>
+    <string name="phone_state_float_battery_voltage">电压：%s</string>
+    <string name="phone_state_float_battery_temperature">电池温度：%s</string>
+    <string name="phone_state_float_rom_state">ROM：%s</string>
+    <string name="phone_state_float_sdcard_rom_state">SDcard：%s</string>
 </resources>
