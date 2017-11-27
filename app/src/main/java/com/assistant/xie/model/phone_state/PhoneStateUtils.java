@@ -158,7 +158,6 @@ class PhoneStateUtils {
      */
     private String getRomTotalSize(Context context) {
         File path = Environment.getDataDirectory();
-        Log.v("testMsg", "getDataDirectory-->" + path.getPath());
         StatFs stat = new StatFs(path.getPath());
         long blockSize = stat.getBlockSizeLong();
         long totalBlocks = stat.getBlockCountLong();

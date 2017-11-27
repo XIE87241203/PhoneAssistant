@@ -1,13 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/defaultBackgroundColor"
     tools:context="com.assistant.xie.model.phone_state.PhoneStateActivity">
 
-    <ListView
-        android:id="@+id/listview"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-</android.support.constraint.ConstraintLayout>
+
+        <Switch
+            android:id="@+id/sw_float_window"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/phone_state_float_window_item"
+            android:background="@color/defaultItemColor"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/default_item_padding"
+            android:paddingStart="@dimen/default_item_padding"
+            android:text="@string/phone_state_all_show_float_window"
+            android:textColor="@color/defaultTextColor" />
+
+
+        <Switch
+            android:id="@+id/sw_ram_static"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/default_item_height"
+            android:layout_marginTop="@dimen/default_type_line"
+            android:background="@color/defaultItemColor"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/default_item_padding"
+            android:paddingStart="@dimen/default_item_padding"
+            android:text="@string/phone_state_ram_static"
+            android:textColor="@color/defaultTextColor" />
+
+        <Switch
+            android:id="@+id/sw_battery_static"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/default_item_height"
+            android:layout_marginTop="@dimen/default_type_line"
+            android:background="@color/defaultItemColor"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/default_item_padding"
+            android:paddingStart="@dimen/default_item_padding"
+            android:text="@string/phone_state_battery_static"
+            android:textColor="@color/defaultTextColor" />
+
+        <Switch
+            android:id="@+id/sw_battery_capacity"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/default_item_height"
+            android:layout_marginTop="@dimen/default_line"
+            android:background="@color/defaultItemColor"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/default_item_padding"
+            android:paddingStart="@dimen/default_item_padding"
+            android:text="@string/phone_state_battery_capacity"
+            android:textColor="@color/defaultTextColor" />
+
+        <Switch
+            android:id="@+id/sw_battery_voltage"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/default_item_height"
+            android:layout_marginTop="@dimen/default_line"
+            android:background="@color/defaultItemColor"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/default_item_padding"
+            android:paddingStart="@dimen/default_item_padding"
+            android:text="@string/phone_state_battery_voltage"
+            android:textColor="@color/defaultTextColor" />
+
+        <Switch
+            android:id="@+id/sw_battery_temperature"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/default_item_height"
+            android:layout_marginTop="@dimen/default_line"
+            android:background="@color/defaultItemColor"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/default_item_padding"
+            android:paddingStart="@dimen/default_item_padding"
+            android:text="@string/phone_state_battery_temperature"
+            android:textColor="@color/defaultTextColor" />
+
+        <Switch
+            android:id="@+id/sw_rom_state"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/default_item_height"
+            android:layout_marginTop="@dimen/default_type_line"
+            android:background="@color/defaultItemColor"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/default_item_padding"
+            android:paddingStart="@dimen/default_item_padding"
+            android:text="@string/phone_state_rom_state"
+            android:textColor="@color/defaultTextColor" />
+
+        <Switch
+            android:id="@+id/sw_sdcard_rom_state"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/default_item_height"
+            android:layout_marginTop="@dimen/default_line"
+            android:background="@color/defaultItemColor"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/default_item_padding"
+            android:paddingStart="@dimen/default_item_padding"
+            android:text="@string/phone_state_sdcard_rom_state"
+            android:textColor="@color/defaultTextColor" />
+    </LinearLayout>
+
+</ScrollView>

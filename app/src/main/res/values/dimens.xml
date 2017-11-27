@@ -1,4 +1,12 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="default_item_height">60dp</dimen>
+    <dimen name="default_list_item_height">60dp</dimen>
+    <dimen name="default_item_height">40dp</dimen>
+    <dimen name="default_item_padding">10dp</dimen>
+    <dimen name="default_line">0.5dp</dimen>
+    <dimen name="default_type_line">10dp</dimen>
+
+    <!--手机状态界面-->
+    <dimen name="phone_state_float_window_item">40dp</dimen>
+    <dimen name="phone_state_title">25dp</dimen>
 </resources>

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
@@ -17,10 +18,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.assistant.xie.R;
+import com.assistant.xie.service.FloatWindowService;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -28,10 +31,10 @@ import java.util.List;
 
 public class PhoneStateActivity extends AppCompatActivity {
     private ListView listview;
-    private List<PhoneStateInfo> data;
     private boolean threadSwitch;
-    private PhoneStateAdapter adapter;
     private UIHandler uiHandler;
+    private Switch sw_float_window, sw_ram_static, sw_battery_static, sw_battery_capacity, sw_battery_voltage,
+            sw_battery_temperature, sw_rom_state, sw_sdcard_rom_state;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,27 +43,24 @@ public class PhoneStateActivity extends AppCompatActivity {
         requestSDCardPermission();
         initView();
         initData();
+//        startFloatService();
     }
 
     private void initView() {
         listview = findViewById(R.id.listview);
+        sw_float_window = findViewById(R.id.sw_float_window);
+        sw_ram_static = findViewById(R.id.sw_ram_static);
+        sw_battery_static = findViewById(R.id.sw_battery_static);
+        sw_battery_capacity = findViewById(R.id.sw_battery_capacity);
+        sw_battery_voltage = findViewById(R.id.sw_battery_voltage);
+        sw_battery_temperature = findViewById(R.id.sw_battery_temperature);
+        sw_rom_state = findViewById(R.id.sw_rom_state);
+        sw_sdcard_rom_state = findViewById(R.id.sw_sdcard_rom_state);
     }
 
     private void initData() {
         //注册电池广播监听
         PhoneStateUtils.getInstance().registerBatteryBroadcast(this);
-
-        data = new ArrayList<>();
-        data.add(new PhoneStateInfo("总内存", PhoneStateUtils.getInstance().getTotalMemory(getApplicationContext())));
-        data.add(new PhoneStateInfo("可用内存"));
-        data.add(new PhoneStateInfo("电池状态"));
-        data.add(new PhoneStateInfo("剩余电量"));
-        data.add(new PhoneStateInfo("当前电压"));
-        data.add(new PhoneStateInfo("电池温度"));
-        data.add(new PhoneStateInfo("手机存储状态"));
-        data.add(new PhoneStateInfo("内存卡存储状态"));
-        adapter = new PhoneStateAdapter(this, data, R.layout.item_phone_state);
-        listview.setAdapter(adapter);
         uiHandler = new UIHandler(this);
         threadSwitch = true;
         Thread thread = new Thread() {
@@ -68,14 +68,7 @@ public class PhoneStateActivity extends AppCompatActivity {
             public void run() {
                 super.run();
                 while (threadSwitch) {
-                    data.get(1).setValue(PhoneStateUtils.getInstance().getAvailMemory(getApplicationContext()));
-                    data.get(2).setValue(PhoneStateUtils.getInstance().getBatteryStatus());
-                    data.get(3).setValue(PhoneStateUtils.getInstance().getBattery());
-                    data.get(4).setValue(PhoneStateUtils.getInstance().getBatteryV());
-                    data.get(5).setValue(PhoneStateUtils.getInstance().getBatteryT());
-                    data.get(6).setValue(PhoneStateUtils.getInstance().getROMUsageStatus(PhoneStateActivity.this));
-                    data.get(7).setValue(PhoneStateUtils.getInstance().getSDUsageStatus(PhoneStateActivity.this));
-                    //刷新listview
+                    //刷新数据
                     uiHandler.sendEmptyMessage(0);
                     try {
                         sleep(1000);
@@ -90,13 +83,41 @@ public class PhoneStateActivity extends AppCompatActivity {
     }
 
     /**
+     * 刷新列表数据
+     */
+    public void refreshData() {
+        sw_ram_static.setText(String.format(getResources().getString(R.string.phone_state_ram_static), PhoneStateUtils.getInstance().getAvailMemory(this), PhoneStateUtils.getInstance().getTotalMemory(this)));
+        sw_battery_static.setText(String.format(getResources().getString(R.string.phone_state_battery_static),PhoneStateUtils.getInstance().getBatteryStatus()));
+        sw_battery_capacity.setText(String.format(getResources().getString(R.string.phone_state_battery_capacity),PhoneStateUtils.getInstance().getBattery()));
+        sw_battery_voltage.setText(String.format(getResources().getString(R.string.phone_state_battery_voltage),PhoneStateUtils.getInstance().getBatteryV()));
+        sw_battery_temperature.setText(String.format(getResources().getString(R.string.phone_state_battery_temperature),PhoneStateUtils.getInstance().getBatteryT()));
+        sw_rom_state.setText(String.format(getResources().getString(R.string.phone_state_rom_state),PhoneStateUtils.getInstance().getROMUsageStatus(this)));
+        sw_sdcard_rom_state.setText(String.format(getResources().getString(R.string.phone_state_sdcard_rom_state),PhoneStateUtils.getInstance().getSDUsageStatus(this)));
+    }
+
+    private void startFloatService() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (!Settings.canDrawOverlays(this)) {
+                Intent settingIntent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                startActivity(settingIntent);
+            } else {
+                Intent intent = new Intent(this, FloatWindowService.class);
+                startService(intent);
+            }
+        } else {
+            Intent intent = new Intent(this, FloatWindowService.class);
+            startService(intent);
+        }
+    }
+
+    /**
      * 请求授权
      */
     private void requestSDCardPermission() {
-        if (ContextCompat.checkSelfPermission(this,Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) { //表示未授权时
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) { //表示未授权时
             //进行授权
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-        }else{
+        } else {
             PhoneStateUtils.getInstance().setSDCardHasPermission(true);
         }
     }
@@ -142,7 +163,7 @@ public class PhoneStateActivity extends AppCompatActivity {
             PhoneStateActivity theActivity = mActivity.get();
             switch (msg.what) {
                 case 0:
-                    theActivity.adapter.notifyDataSetChanged();
+                    theActivity.refreshData();
                     break;
             }
         }
