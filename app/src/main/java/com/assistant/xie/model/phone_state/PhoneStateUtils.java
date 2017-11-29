@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.TrafficStats;
 import android.os.BatteryManager;
 import android.os.Environment;
 import android.os.StatFs;
@@ -12,12 +13,20 @@ import android.support.annotation.NonNull;
 import android.text.format.Formatter;
 import android.util.Log;
 
+import com.assistant.xie.Utils.SharePreferenceUtils;
 import com.assistant.xie.model.main.MainActivity;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.logging.SimpleFormatter;
 
 /**
  * Created by XIE on 2017/11/24.
@@ -32,12 +41,90 @@ class PhoneStateUtils {
     private static PhoneStateUtils instance;
     private String batteryState;//电池状态信息
     private MyBroadcastReceiver broadcastReceiver;//电池广播监听
+    private long lastTotalRxBytes;//上次下载的数据量
+    private long lastTotalTxBytes;//上次上传的数据量
 
     static PhoneStateUtils getInstance() {
         if (instance == null) {
             instance = new PhoneStateUtils();
         }
         return instance;
+    }
+
+    /**
+     * 获取手机状态开关缓存
+     * @param context context
+     * @return Map<String,Boolean>
+     */
+    synchronized Map<String,Boolean> getSaveData(Context context){
+        //获取所有变量的值
+        HashMap<String, Boolean> map = new HashMap<>();
+        try {
+            Field[] fields = PhoneStateStaticConstants.class.getDeclaredFields();
+            for (Field field : fields) {
+                if (field.getName().contains("SAVE_KEY")) {
+                    map.put(field.get(PhoneStateStaticConstants.class).toString(), false);
+                }
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        //从缓存中读取开关信息
+        return SharePreferenceUtils.loadBooleanData(context, SharePreferenceUtils.SAVE_NAME_PHONE_STATE, map);
+    }
+
+    /**
+     * 获取相对于上次下载的数据量(KB)
+     * 需要每秒调用一次
+     *
+     * @return 相对于上次下载的数据量
+     */
+    synchronized String getRxNetSpeed(int refreshTime) {
+        DecimalFormat decimalFormat = new DecimalFormat("0.##");
+        long nowTotalRxBytes = TrafficStats.getTotalRxBytes() == TrafficStats.UNSUPPORTED ? 0 : (TrafficStats.getTotalRxBytes());//转为KB
+        String unit = "B/s";
+        String result = "0";
+        if (lastTotalRxBytes != 0 && refreshTime / 1000 != 0) {
+            double speed = (nowTotalRxBytes - lastTotalRxBytes) / (refreshTime / 1000);
+            if (speed > 1024) {
+                speed = speed / 1024;
+                unit = "K/s";
+            }
+            if (speed > 1024) {
+                speed = speed / 1024;
+                unit = "M/s";
+            }
+            result = decimalFormat.format(speed) + unit;
+        }
+        lastTotalRxBytes = nowTotalRxBytes;
+        return result;
+    }
+
+    /**
+     * 获取相对于上次上传的数据量(KB)
+     * 需要每秒调用一次
+     *
+     * @return 相对于上次上传的数据量
+     */
+    synchronized String getTxNetSpeed(int refreshTime) {
+        DecimalFormat decimalFormat = new DecimalFormat("0.##");
+        long nowTotalTxBytes = TrafficStats.getTotalTxBytes() == TrafficStats.UNSUPPORTED ? 0 : (TrafficStats.getTotalTxBytes());//转为KB
+        String unit = "B/s";
+        String result = "0" + unit;
+        if (lastTotalTxBytes != 0 && refreshTime / 1000 != 0) {
+            double speed = (nowTotalTxBytes - lastTotalTxBytes) / (refreshTime / 1000);
+            if (speed > 1024) {
+                speed = speed / 1024;
+                unit = "K/s";
+            }
+            if (speed > 1024) {
+                speed = speed / 1024;
+                unit = "M/s";
+            }
+            result = decimalFormat.format(speed) + unit;
+        }
+        lastTotalTxBytes = nowTotalTxBytes;
+        return result;
     }
 
     /**
@@ -103,7 +190,7 @@ class PhoneStateUtils {
      * @param context context
      * @return 内存卡存储状态
      */
-    String getSDUsageStatus(Context context) {
+    synchronized String getSDUsageStatus(Context context) {
         if (!sdCardHasPermission) return STRING_NO_SDCARD_PERMISSION;
         // 判断是否有插入并挂载存储卡(通过判断设备是否能够移除来判断是否是内存卡)
         if (Environment.isExternalStorageRemovable() && Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
@@ -119,7 +206,7 @@ class PhoneStateUtils {
      * @param context context
      * @return 手机内部存储状态
      */
-    String getROMUsageStatus(Context context) {
+    synchronized String getROMUsageStatus(Context context) {
         return getRomAvailableSize(context) + "/" + getRomTotalSize(context);
     }
 
@@ -144,7 +231,6 @@ class PhoneStateUtils {
      */
     private String getSDAvailableSize(Context context) {
         File path = Environment.getExternalStorageDirectory();
-        Log.v("testMsg", "getExternalStorageDirectory-->" + path.getPath());
         StatFs stat = new StatFs(path.getPath());
         long blockSize = stat.getBlockSizeLong();
         long availableBlocks = stat.getAvailableBlocksLong();

@@ -3,7 +3,6 @@ package com.assistant.xie.model.phone_state;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.WindowManager;
@@ -13,8 +12,13 @@ import android.widget.TextView;
 import com.assistant.xie.R;
 import com.assistant.xie.Utils.DisplayUtil;
 import com.assistant.xie.Utils.FloatingManager;
+import com.assistant.xie.Utils.SharePreferenceUtils;
+import com.assistant.xie.service.FloatWindowService;
 
-import java.util.zip.Inflater;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by XIE on 2017/11/27.
@@ -24,12 +28,15 @@ import java.util.zip.Inflater;
 public class PhoneStateFloatView extends LinearLayout {
     private TextView tv_msg;
     private FloatingManager mWindowManager;
+    private Map<String, Boolean> switchMap;
+    private boolean isShow = false;
 
     public PhoneStateFloatView(Context context) {
         super(context);
         LayoutInflater.from(context).inflate(R.layout.float_window_phone_state, this);
         mWindowManager = FloatingManager.getInstance(context);
         tv_msg = findViewById(R.id.tv_msg);
+        refreshView();
     }
 
     @Override
@@ -46,11 +53,34 @@ public class PhoneStateFloatView extends LinearLayout {
         PhoneStateUtils.getInstance().unregisterBatteryBroadcast(getContext());
     }
 
+    public void refreshView() {
+        //从缓存中读取开关信息
+        switchMap = PhoneStateUtils.getInstance().getSaveData(getContext());
+        if (!switchMap.isEmpty()) {
+            Iterator<Map.Entry<String, Boolean>> it = switchMap.entrySet().iterator();
+            while (it.hasNext()){
+                Map.Entry<String, Boolean> entry = it.next();
+                if (!entry.getValue()) {
+                    it.remove();
+                }
+            }
+            if (!switchMap.isEmpty()) {
+                //如果有开了的开关
+                refreshMsg();
+                show();
+            } else {
+                hide();
+            }
+        }
+    }
+
     /**
      * 刷新状态信息
      */
     public void refreshMsg() {
         if (isAttachedToWindow()) {
+            String upload_speed = PhoneStateUtils.getInstance().getTxNetSpeed(FloatWindowService.REFRESH_TIME);
+            String download_speed = PhoneStateUtils.getInstance().getRxNetSpeed(FloatWindowService.REFRESH_TIME);
             String ram_static = PhoneStateUtils.getInstance().getAvailMemory(getContext()) + "/" + PhoneStateUtils.getInstance().getTotalMemory(getContext());
             String battery_static = PhoneStateUtils.getInstance().getBatteryStatus();
             String battery_capacity = PhoneStateUtils.getInstance().getBattery();
@@ -58,17 +88,10 @@ public class PhoneStateFloatView extends LinearLayout {
             String battery_temperature = PhoneStateUtils.getInstance().getBatteryT();
             String rom_state = PhoneStateUtils.getInstance().getROMUsageStatus(getContext());
             String sdcard_rom_state = PhoneStateUtils.getInstance().getSDUsageStatus(getContext());
-            String msg = "";
-            msg += String.format(getResources().getString(R.string.phone_state_float_ram_static), ram_static) + "\n";
-            msg += String.format(getResources().getString(R.string.phone_state_float_battery_static), battery_static) + "\n";
-            msg += String.format(getResources().getString(R.string.phone_state_float_battery_capacity), battery_capacity) + "\n";
-            msg += String.format(getResources().getString(R.string.phone_state_float_battery_voltage), battery_voltage) + "\n";
-            msg += String.format(getResources().getString(R.string.phone_state_float_battery_temperature), battery_temperature) + "\n";
-            msg += String.format(getResources().getString(R.string.phone_state_float_rom_state), rom_state) + "\n";
-            msg += String.format(getResources().getString(R.string.phone_state_float_sdcard_rom_state), sdcard_rom_state);
-            tv_msg.setText(msg);
             //发送广播更新activity
             Intent counterIntent = new Intent();
+            counterIntent.putExtra("upload_speed", upload_speed);
+            counterIntent.putExtra("download_speed", download_speed);
             counterIntent.putExtra("ram_static", ram_static);
             counterIntent.putExtra("battery_static", battery_static);
             counterIntent.putExtra("battery_capacity", battery_capacity);
@@ -78,10 +101,48 @@ public class PhoneStateFloatView extends LinearLayout {
             counterIntent.putExtra("sdcard_rom_state", sdcard_rom_state);
             counterIntent.setAction("com.assistant.xie.REFRESH_PHONE_STATE");
             getContext().sendBroadcast(counterIntent);
+
+            if (!switchMap.isEmpty() && isShow) {
+                StringBuilder msg = new StringBuilder();
+                for (String key : switchMap.keySet()) {
+                    switch (key) {
+                        case PhoneStateStaticConstants.SAVE_KEY_UPLOAD_SPEED:
+                            msg.append(String.format(getResources().getString(R.string.phone_state_float_upload_speed), upload_speed));
+                            break;
+                        case PhoneStateStaticConstants.SAVE_KEY_DOWNLOAD_SPEED:
+                            msg.append(String.format(getResources().getString(R.string.phone_state_float_download_speed), download_speed));
+                            break;
+                        case PhoneStateStaticConstants.SAVE_KEY_RAM_STATIC:
+                            msg.append(String.format(getResources().getString(R.string.phone_state_float_ram_static), ram_static));
+                            break;
+                        case PhoneStateStaticConstants.SAVE_KEY_BATTERY_STATIC:
+                            msg.append(String.format(getResources().getString(R.string.phone_state_float_battery_static), battery_static));
+                            break;
+                        case PhoneStateStaticConstants.SAVE_KEY_BATTERY_CAPACITY:
+                            msg.append(String.format(getResources().getString(R.string.phone_state_float_battery_capacity), battery_capacity));
+                            break;
+                        case PhoneStateStaticConstants.SAVE_KEY_BATTERY_VOLTAGE:
+                            msg.append(String.format(getResources().getString(R.string.phone_state_float_battery_voltage), battery_voltage));
+                            break;
+                        case PhoneStateStaticConstants.SAVE_KEY_BATTERY_TEMPERATURE:
+                            msg.append(String.format(getResources().getString(R.string.phone_state_float_battery_temperature), battery_temperature));
+                            break;
+                        case PhoneStateStaticConstants.SAVE_KEY_ROM_STATE:
+                            msg.append(String.format(getResources().getString(R.string.phone_state_float_rom_state), rom_state));
+                            break;
+                        case PhoneStateStaticConstants.SAVE_KEY_SDCARD_ROM_STATE:
+                            msg.append(String.format(getResources().getString(R.string.phone_state_float_sdcard_rom_state), sdcard_rom_state));
+                            break;
+                    }
+                    msg.append("\n");
+                }
+                msg.delete(msg.length() - 1, msg.length());
+                tv_msg.setText(msg.toString());
+            }
         }
     }
 
-    public void show() {
+    private void show() {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
         params.gravity = Gravity.TOP | Gravity.START;
         params.y = DisplayUtil.getStarusBarHeight(getContext());
@@ -95,9 +156,12 @@ public class PhoneStateFloatView extends LinearLayout {
         params.width = LayoutParams.WRAP_CONTENT;
         params.height = LayoutParams.WRAP_CONTENT;
         mWindowManager.addView(this, params);
+        isShow = true;
     }
 
     public void hide() {
+        tv_msg.setText("");
         mWindowManager.removeView(this);
+        isShow = false;
     }
 }

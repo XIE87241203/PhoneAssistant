@@ -6,15 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 
-import com.assistant.xie.Utils.FloatingManager;
-import com.assistant.xie.model.phone_state.PhoneStateActivity;
 import com.assistant.xie.model.phone_state.PhoneStateFloatView;
 
 import java.lang.ref.WeakReference;
@@ -29,6 +25,8 @@ import java.util.TimerTask;
  */
 
 public class FloatWindowService extends Service {
+    //悬浮窗刷新时间
+    public static final int REFRESH_TIME = 1000;
     /**
      * 定时器，定时进行检测当前应该创建还是移除悬浮窗。
      */
@@ -42,13 +40,12 @@ public class FloatWindowService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         handler = new UIHandler(this);
-        // 开启定时器，每隔0.5秒刷新一次
+        // 开启定时器，每隔1秒刷新一次
         if (timer == null) {
             timer = new Timer();
-            timer.scheduleAtFixedRate(new RefreshFloatWindowTask(), 0, 1000);
+            timer.scheduleAtFixedRate(new RefreshFloatWindowTask(), 0, REFRESH_TIME);
         }
         phoneStateFloatView = new PhoneStateFloatView(getApplicationContext());
-        phoneStateFloatView.show();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -67,7 +64,7 @@ public class FloatWindowService extends Service {
             FloatWindowService service = mService.get();
             switch (msg.what) {
                 case 1:
-                    service.phoneStateFloatView.refreshMsg();
+                    service.phoneStateFloatView.refreshView();
                     break;
             }
         }

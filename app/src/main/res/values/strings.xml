@@ -13,6 +13,8 @@
     <string name="phone_state_battery_temperature">电池温度：%s</string>
     <string name="phone_state_rom_state">手机存储状态：%s</string>
     <string name="phone_state_sdcard_rom_state">内存卡存储状态：%s</string>
+    <string name="phone_state_download_speed">下载速度：%s</string>
+    <string name="phone_state_upload_speed">上传速度：%s</string>
     <!--手机状态悬浮窗-->
     <string name="phone_state_float_ram_static">RAM：%s</string>
     <string name="phone_state_float_battery_static">电池状态：%s</string>
@@ -21,4 +23,6 @@
     <string name="phone_state_float_battery_temperature">电池温度：%s</string>
     <string name="phone_state_float_rom_state">ROM：%s</string>
     <string name="phone_state_float_sdcard_rom_state">SDcard：%s</string>
+    <string name="phone_state_float_download_speed">下载：%s</string>
+    <string name="phone_state_float_upload_speed">上传：%s</string>
 </resources>
