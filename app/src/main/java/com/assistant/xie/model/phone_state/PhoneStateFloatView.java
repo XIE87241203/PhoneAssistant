@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,10 +24,11 @@ import java.util.Map;
  * 手机状态悬浮窗
  */
 
-public class PhoneStateFloatView extends LinearLayout {
+public class PhoneStateFloatView extends LinearLayout implements View.OnClickListener {
     private TextView tv_msg;
     private FloatingManager mWindowManager;
-    private boolean isShow = false;
+    private boolean isOpen = false;
+    private boolean isHide = false;
     private List<String> switchList;
 
     public PhoneStateFloatView(Context context) {
@@ -35,6 +37,7 @@ public class PhoneStateFloatView extends LinearLayout {
         mWindowManager = FloatingManager.getInstance(context);
         tv_msg = findViewById(R.id.tv_msg);
         switchList = new ArrayList<>();
+        setOnClickListener(this);
         refreshView();
     }
 
@@ -59,18 +62,24 @@ public class PhoneStateFloatView extends LinearLayout {
             if (!switchMap.isEmpty()) {
                 //如果有开了的开关
                 refreshMsg();
-                show();
+                open();
             } else {
-                hide();
+                close();
             }
         }
         //获取打开的tag
         List<String> saveTag = PhoneStateUtils.getInstance().getSaveTagList();
         switchList.clear();
-        for(String tag:saveTag){
-            if(switchMap.get(tag)){
+        for (String tag : saveTag) {
+            if (switchMap.get(tag)) {
                 switchList.add(tag);
             }
+        }
+        if(isHide) isHide= false;
+        if(switchList.isEmpty()){
+            close();
+        }else{
+            open();
         }
 
     }
@@ -102,8 +111,9 @@ public class PhoneStateFloatView extends LinearLayout {
             counterIntent.putExtra("sdcard_rom_state", sdcard_rom_state);
             counterIntent.setAction("com.assistant.xie.REFRESH_PHONE_STATE");
             getContext().sendBroadcast(counterIntent);
-            StringBuilder msg = new StringBuilder();
-            if (!switchList.isEmpty() && isShow) {
+            //隐藏时保留框大小
+            if (!switchList.isEmpty() && isOpen &&!isHide) {
+                StringBuilder msg = new StringBuilder();
                 for (String tag : switchList) {
                     switch (tag) {
                         case PhoneStateStaticConstants.SAVE_KEY_2_UPLOAD_SPEED:
@@ -137,12 +147,16 @@ public class PhoneStateFloatView extends LinearLayout {
                     msg.append("\n");
                 }
                 msg.delete(msg.length() - 1, msg.length());
+                tv_msg.setText(msg.toString());
             }
-            tv_msg.setText(msg.toString());
+            if(isHide){
+                tv_msg.setText("显示");
+            }
         }
     }
 
-    private void show() {
+    private void open() {
+        if(isOpen) return;
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
         params.gravity = Gravity.TOP | Gravity.START;
         params.y = DisplayUtil.getStarusBarHeight(getContext());
@@ -152,16 +166,23 @@ public class PhoneStateFloatView extends LinearLayout {
         params.format = PixelFormat.RGBA_8888;
         params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR |
-                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
         params.width = LayoutParams.WRAP_CONTENT;
         params.height = LayoutParams.WRAP_CONTENT;
         mWindowManager.addView(this, params);
-        isShow = true;
+        isOpen = true;
     }
 
-    public void hide() {
+    public void close() {
+        if(!isOpen) return;
         tv_msg.setText("");
         mWindowManager.removeView(this);
-        isShow = false;
+        isOpen = false;
+    }
+
+    @Override
+    public void onClick(View v) {
+        isHide=!isHide;
+        refreshMsg();
     }
 }

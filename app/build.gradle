@@ -34,10 +34,10 @@ android {
             if (outputFile != null && outputFile.name.endsWith('.apk')) {
                 if (variant.buildType.name.equals('release')) {
                     variant.mergedFlavor.versionName = getVersionName()
-                    fileName = "XXXX_${variant.mergedFlavor.versionName}_release.apk"
+                    fileName = "手机助手_${variant.mergedFlavor.versionName}_release.apk"
                 } else if (variant.buildType.name.equals('debug')) {
                     variant.mergedFlavor.versionName = getVersionName() + "." + releaseTime()
-                    fileName = "XXXX_${variant.mergedFlavor.versionName}_debug.apk"
+                    fileName = "手机助手_${variant.mergedFlavor.versionName}_debug.apk"
                 }
                 outputFileName = fileName + ".apk"
             }

@@ -92,7 +92,6 @@ class PhoneStateUtils {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        Log.v("testMsg",result.toString());
         //从缓存中读取开关信息
         return result;
     }

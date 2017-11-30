@@ -95,7 +95,7 @@ public class FloatWindowService extends Service {
         // Service被终止的同时也停止定时器继续运行
         timer.cancel();
         timer = null;
-        phoneStateFloatView.hide();
+        phoneStateFloatView.close();
         phoneStateFloatView = null;
         unregisterReceiver(receiver);
         super.onDestroy();

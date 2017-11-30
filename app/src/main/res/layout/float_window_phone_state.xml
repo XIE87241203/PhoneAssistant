@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/floatWindowBackground">
 
     <TextView
         android:id="@+id/tv_msg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#ffffff"
-        android:text="@string/text_holder"
-        android:background="@color/floatWindowBackground"/>
+        android:textSize="13sp"
+        android:padding="1dp"
+        android:text="@string/text_holder"/>
 </LinearLayout>
