@@ -5,14 +5,14 @@ package com.assistant.xie.model.phone_state;
  * 静态常量
  */
 
-public class PhoneStateStaticConstants {
-    public static final String SAVE_KEY_UPLOAD_SPEED = "upload_speed";
-    public static final String SAVE_KEY_DOWNLOAD_SPEED = "download_speed";
-    public static final String SAVE_KEY_RAM_STATIC = "ram_static";
-    public static final String SAVE_KEY_BATTERY_STATIC = "battery_static";
-    public static final String SAVE_KEY_BATTERY_CAPACITY = "battery_capacity";
-    public static final String SAVE_KEY_BATTERY_VOLTAGE = "battery_voltage";
-    public static final String SAVE_KEY_BATTERY_TEMPERATURE = "battery_temperature";
-    public static final String SAVE_KEY_ROM_STATE = "rom_state";
-    public static final String SAVE_KEY_SDCARD_ROM_STATE = "sdcard_rom_state";
+class PhoneStateStaticConstants {
+    static final String SAVE_KEY_1_RAM_STATIC = "ram_static";
+    static final String SAVE_KEY_2_UPLOAD_SPEED = "upload_speed";
+    static final String SAVE_KEY_3_DOWNLOAD_SPEED = "download_speed";
+    static final String SAVE_KEY_4_BATTERY_STATIC = "battery_static";
+    static final String SAVE_KEY_5_BATTERY_CAPACITY = "battery_capacity";
+    static final String SAVE_KEY_6_BATTERY_VOLTAGE = "battery_voltage";
+    static final String SAVE_KEY_7_BATTERY_TEMPERATURE = "battery_temperature";
+    static final String SAVE_KEY_8_ROM_STATE = "rom_state";
+    static final String SAVE_KEY_9_SDCARD_ROM_STATE = "sdcard_rom_state";
 }

@@ -61,15 +61,15 @@ public class PhoneStateActivity extends AppCompatActivity implements CompoundBut
         sw_sdcard_rom_state = findViewById(R.id.sw_sdcard_rom_state);
 
         switchMap = new HashMap<>();
-        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_UPLOAD_SPEED, sw_upload_speed);
-        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_DOWNLOAD_SPEED, sw_download_speed);
-        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_RAM_STATIC, sw_ram_static);
-        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_BATTERY_STATIC, sw_battery_static);
-        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_BATTERY_CAPACITY, sw_battery_capacity);
-        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_BATTERY_VOLTAGE, sw_battery_voltage);
-        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_BATTERY_TEMPERATURE, sw_battery_temperature);
-        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_ROM_STATE, sw_rom_state);
-        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_SDCARD_ROM_STATE, sw_sdcard_rom_state);
+        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_2_UPLOAD_SPEED, sw_upload_speed);
+        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_3_DOWNLOAD_SPEED, sw_download_speed);
+        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_1_RAM_STATIC, sw_ram_static);
+        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_4_BATTERY_STATIC, sw_battery_static);
+        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_5_BATTERY_CAPACITY, sw_battery_capacity);
+        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_6_BATTERY_VOLTAGE, sw_battery_voltage);
+        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_7_BATTERY_TEMPERATURE, sw_battery_temperature);
+        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_8_ROM_STATE, sw_rom_state);
+        switchMap.put(PhoneStateStaticConstants.SAVE_KEY_9_SDCARD_ROM_STATE, sw_sdcard_rom_state);
 
     }
 
@@ -113,10 +113,10 @@ public class PhoneStateActivity extends AppCompatActivity implements CompoundBut
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         //如果没有权限的话，设置为未开启
+        //全选
+        ViewGroup parent = (ViewGroup) sw_float_window.getParent();
         switch (buttonView.getId()) {
             case R.id.sw_float_window:
-                //全选
-                ViewGroup parent = (ViewGroup) sw_float_window.getParent();
                 for (int i = 0; i < parent.getChildCount(); i++) {
                     if (parent.getChildAt(i) instanceof Switch && parent.getChildAt(i).getId() != R.id.sw_float_window) {
                         ((Switch) parent.getChildAt(i)).setChecked(isChecked);
@@ -125,14 +125,36 @@ public class PhoneStateActivity extends AppCompatActivity implements CompoundBut
                 break;
             default:
                 SharePreferenceUtils.saveBooleanData(this, SharePreferenceUtils.SAVE_NAME_PHONE_STATE, (String) buttonView.getTag(), isChecked);
-                //关闭全选
                 if(!isChecked) {
+                    //关闭全选
                     sw_float_window.setOnCheckedChangeListener(null);
                     sw_float_window.setChecked(false);
                     sw_float_window.setOnCheckedChangeListener(this);
+                }else{
+                    //判断开启全选
+                    //全选
+                    boolean isAllTrue = true;
+                    for (int i = 0; i < parent.getChildCount(); i++) {
+                        if (parent.getChildAt(i) instanceof Switch && parent.getChildAt(i).getId() != R.id.sw_float_window) {
+                            if(!((Switch) parent.getChildAt(i)).isChecked()){
+                                isAllTrue = false;
+                                break;
+                            }
+                        }
+                    }
+                    if(isAllTrue){
+                        sw_float_window.setOnCheckedChangeListener(null);
+                        sw_float_window.setChecked(true);
+                        sw_float_window.setOnCheckedChangeListener(this);
+                    }
                 }
                 break;
         }
+
+        //发送广播更新悬浮窗
+        Intent counterIntent = new Intent();
+        counterIntent.setAction("com.assistant.xie.REFRESH_FLOAT_VIEW");
+        sendBroadcast(counterIntent);
     }
 
     public class RefreshPhoneStateReceiver extends BroadcastReceiver {

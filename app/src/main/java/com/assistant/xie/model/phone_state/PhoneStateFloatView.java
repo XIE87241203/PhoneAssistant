@@ -12,12 +12,10 @@ import android.widget.TextView;
 import com.assistant.xie.R;
 import com.assistant.xie.Utils.DisplayUtil;
 import com.assistant.xie.Utils.FloatingManager;
-import com.assistant.xie.Utils.SharePreferenceUtils;
 import com.assistant.xie.service.FloatWindowService;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,14 +26,15 @@ import java.util.Map;
 public class PhoneStateFloatView extends LinearLayout {
     private TextView tv_msg;
     private FloatingManager mWindowManager;
-    private Map<String, Boolean> switchMap;
     private boolean isShow = false;
+    private List<String> switchList;
 
     public PhoneStateFloatView(Context context) {
         super(context);
         LayoutInflater.from(context).inflate(R.layout.float_window_phone_state, this);
         mWindowManager = FloatingManager.getInstance(context);
         tv_msg = findViewById(R.id.tv_msg);
+        switchList = new ArrayList<>();
         refreshView();
     }
 
@@ -55,15 +54,8 @@ public class PhoneStateFloatView extends LinearLayout {
 
     public void refreshView() {
         //从缓存中读取开关信息
-        switchMap = PhoneStateUtils.getInstance().getSaveData(getContext());
+        Map<String, Boolean> switchMap = PhoneStateUtils.getInstance().getSaveData(getContext());
         if (!switchMap.isEmpty()) {
-            Iterator<Map.Entry<String, Boolean>> it = switchMap.entrySet().iterator();
-            while (it.hasNext()){
-                Map.Entry<String, Boolean> entry = it.next();
-                if (!entry.getValue()) {
-                    it.remove();
-                }
-            }
             if (!switchMap.isEmpty()) {
                 //如果有开了的开关
                 refreshMsg();
@@ -72,6 +64,15 @@ public class PhoneStateFloatView extends LinearLayout {
                 hide();
             }
         }
+        //获取打开的tag
+        List<String> saveTag = PhoneStateUtils.getInstance().getSaveTagList();
+        switchList.clear();
+        for(String tag:saveTag){
+            if(switchMap.get(tag)){
+                switchList.add(tag);
+            }
+        }
+
     }
 
     /**
@@ -101,44 +102,43 @@ public class PhoneStateFloatView extends LinearLayout {
             counterIntent.putExtra("sdcard_rom_state", sdcard_rom_state);
             counterIntent.setAction("com.assistant.xie.REFRESH_PHONE_STATE");
             getContext().sendBroadcast(counterIntent);
-
-            if (!switchMap.isEmpty() && isShow) {
-                StringBuilder msg = new StringBuilder();
-                for (String key : switchMap.keySet()) {
-                    switch (key) {
-                        case PhoneStateStaticConstants.SAVE_KEY_UPLOAD_SPEED:
+            StringBuilder msg = new StringBuilder();
+            if (!switchList.isEmpty() && isShow) {
+                for (String tag : switchList) {
+                    switch (tag) {
+                        case PhoneStateStaticConstants.SAVE_KEY_2_UPLOAD_SPEED:
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_upload_speed), upload_speed));
                             break;
-                        case PhoneStateStaticConstants.SAVE_KEY_DOWNLOAD_SPEED:
+                        case PhoneStateStaticConstants.SAVE_KEY_3_DOWNLOAD_SPEED:
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_download_speed), download_speed));
                             break;
-                        case PhoneStateStaticConstants.SAVE_KEY_RAM_STATIC:
+                        case PhoneStateStaticConstants.SAVE_KEY_1_RAM_STATIC:
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_ram_static), ram_static));
                             break;
-                        case PhoneStateStaticConstants.SAVE_KEY_BATTERY_STATIC:
+                        case PhoneStateStaticConstants.SAVE_KEY_4_BATTERY_STATIC:
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_battery_static), battery_static));
                             break;
-                        case PhoneStateStaticConstants.SAVE_KEY_BATTERY_CAPACITY:
+                        case PhoneStateStaticConstants.SAVE_KEY_5_BATTERY_CAPACITY:
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_battery_capacity), battery_capacity));
                             break;
-                        case PhoneStateStaticConstants.SAVE_KEY_BATTERY_VOLTAGE:
+                        case PhoneStateStaticConstants.SAVE_KEY_6_BATTERY_VOLTAGE:
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_battery_voltage), battery_voltage));
                             break;
-                        case PhoneStateStaticConstants.SAVE_KEY_BATTERY_TEMPERATURE:
+                        case PhoneStateStaticConstants.SAVE_KEY_7_BATTERY_TEMPERATURE:
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_battery_temperature), battery_temperature));
                             break;
-                        case PhoneStateStaticConstants.SAVE_KEY_ROM_STATE:
+                        case PhoneStateStaticConstants.SAVE_KEY_8_ROM_STATE:
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_rom_state), rom_state));
                             break;
-                        case PhoneStateStaticConstants.SAVE_KEY_SDCARD_ROM_STATE:
+                        case PhoneStateStaticConstants.SAVE_KEY_9_SDCARD_ROM_STATE:
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_sdcard_rom_state), sdcard_rom_state));
                             break;
                     }
                     msg.append("\n");
                 }
                 msg.delete(msg.length() - 1, msg.length());
-                tv_msg.setText(msg.toString());
             }
+            tv_msg.setText(msg.toString());
         }
     }
 
@@ -152,7 +152,7 @@ public class PhoneStateFloatView extends LinearLayout {
         params.format = PixelFormat.RGBA_8888;
         params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR |
-                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
+                WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
         params.width = LayoutParams.WRAP_CONTENT;
         params.height = LayoutParams.WRAP_CONTENT;
         mWindowManager.addView(this, params);

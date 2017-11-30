@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.SimpleFormatter;
@@ -71,6 +73,28 @@ class PhoneStateUtils {
         }
         //从缓存中读取开关信息
         return SharePreferenceUtils.loadBooleanData(context, SharePreferenceUtils.SAVE_NAME_PHONE_STATE, map);
+    }
+
+    /**
+     * 获取手机状态开关缓存
+     * @return List<String>
+     */
+    synchronized List<String> getSaveTagList(){
+        //获取所有变量的值
+        List<String> result = new ArrayList<>();
+        try {
+            Field[] fields = PhoneStateStaticConstants.class.getDeclaredFields();
+            for (Field field : fields) {
+                if (field.getName().contains("SAVE_KEY")) {
+                    result.add(field.get(PhoneStateStaticConstants.class).toString());
+                }
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        Log.v("testMsg",result.toString());
+        //从缓存中读取开关信息
+        return result;
     }
 
     /**

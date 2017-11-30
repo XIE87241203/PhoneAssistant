@@ -2,8 +2,10 @@ package com.assistant.xie.service;
 
 import android.app.ActivityManager;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Handler;
@@ -26,7 +28,9 @@ import java.util.TimerTask;
 
 public class FloatWindowService extends Service {
     //悬浮窗刷新时间
-    public static final int REFRESH_TIME = 1000;
+    public static final int REFRESH_TIME = 2000;
+    private static final int HANDLER_WHAT_REFRESH_MSG = 1;
+    private static final int HANDLER_WHAT_REFRESH_VIEW = 2;
     /**
      * 定时器，定时进行检测当前应该创建还是移除悬浮窗。
      */
@@ -37,6 +41,8 @@ public class FloatWindowService extends Service {
 
     public PhoneStateFloatView phoneStateFloatView;
 
+    private RefreshFloatViewReceiver receiver;
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         handler = new UIHandler(this);
@@ -46,6 +52,9 @@ public class FloatWindowService extends Service {
             timer.scheduleAtFixedRate(new RefreshFloatWindowTask(), 0, REFRESH_TIME);
         }
         phoneStateFloatView = new PhoneStateFloatView(getApplicationContext());
+        //注册广播接收器
+        receiver = new RefreshFloatViewReceiver();
+        registerReceiver(receiver, new IntentFilter("com.assistant.xie.REFRESH_FLOAT_VIEW"));
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -63,10 +72,21 @@ public class FloatWindowService extends Service {
         public void handleMessage(Message msg) {
             FloatWindowService service = mService.get();
             switch (msg.what) {
-                case 1:
+                case HANDLER_WHAT_REFRESH_MSG:
+                    service.phoneStateFloatView.refreshMsg();
+                    break;
+                case HANDLER_WHAT_REFRESH_VIEW:
                     service.phoneStateFloatView.refreshView();
                     break;
             }
+        }
+    }
+
+
+    public class RefreshFloatViewReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            handler.sendEmptyMessage(HANDLER_WHAT_REFRESH_VIEW);
         }
     }
 
@@ -77,6 +97,7 @@ public class FloatWindowService extends Service {
         timer = null;
         phoneStateFloatView.hide();
         phoneStateFloatView = null;
+        unregisterReceiver(receiver);
         super.onDestroy();
     }
 
@@ -90,7 +111,7 @@ public class FloatWindowService extends Service {
 
         @Override
         public void run() {
-            handler.sendEmptyMessage(1);
+            handler.sendEmptyMessage(HANDLER_WHAT_REFRESH_MSG);
         }
     }
 
