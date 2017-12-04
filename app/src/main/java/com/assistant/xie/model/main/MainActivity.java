@@ -36,7 +36,7 @@ public class MainActivity extends BaseActivity {
 
     private void initData() {
         data = new ArrayList<>();
-        data.add(new MainActivityInfo("手机状态", "查看手机cpu使用，内存使用，温度等状态", PhoneStateActivity.class));
+        data.add(new MainActivityInfo("手机状态", "查看手机下载上传速度、内存状态和电池状态等信息", PhoneStateActivity.class));
         listView.setAdapter(new MainActivityAdapter(this,data,R.layout.item_main));
     }
 

@@ -8,13 +8,23 @@ import android.content.Context;
  * @author skydu
  */
 public class DisplayUtil {
+    private static DisplayUtil displayUtil;
+    private int starusBarHeight = -1;
+
+    public static DisplayUtil getInstance() {
+        if (displayUtil == null) {
+            displayUtil = new DisplayUtil();
+        }
+        return displayUtil;
+    }
+
     /**
      * 将px值转换为dip或dp值，保证尺寸大小不变
      *
      * @param pxValue pxValue
      * @return int
      */
-    public static int px2dip(Context context, float pxValue) {
+    public int px2dip(Context context, float pxValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (pxValue / scale + 0.5f);
     }
@@ -25,7 +35,7 @@ public class DisplayUtil {
      * @param dipValue dipValue
      * @return int
      */
-    public static int dip2px(Context context, float dipValue) {
+    public int dip2px(Context context, float dipValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dipValue * scale + 0.5f);
     }
@@ -37,7 +47,7 @@ public class DisplayUtil {
      * @param pxValue pxValue
      * @return int
      */
-    public static int px2sp(Context context, float pxValue) {
+    public int px2sp(Context context, float pxValue) {
         final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
         return (int) (pxValue / fontScale + 0.5f);
     }
@@ -48,32 +58,34 @@ public class DisplayUtil {
      * @param spValue spValue
      * @return int
      */
-    public static int sp2px(Context context, float spValue) {
+    public int sp2px(Context context, float spValue) {
         final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
         return (int) (spValue * fontScale + 0.5f);
     }
 
-    public static int getScreenHeight(Context context) {
+    public int getScreenHeight(Context context) {
         return context.getResources().getDisplayMetrics().heightPixels;
     }
 
-    public static int getScreenWidth(Context context) {
+    public int getScreenWidth(Context context) {
         return context.getResources().getDisplayMetrics().widthPixels;
     }
 
     /**
      * 获取状态栏高度
-     * @param  context context
+     *
+     * @param context context
      * @return 状态栏高度
      */
-    public static int getStarusBarHeight(Context context) {
-        int statusBarHeight = 0;
-        //获取status_bar_height资源的ID
-        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            //根据资源ID获取响应的尺寸值
-            statusBarHeight = context.getResources().getDimensionPixelSize(resourceId);
+    public int getStarusBarHeight(Context context) {
+        if(starusBarHeight == -1){
+            //获取status_bar_height资源的ID
+            int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+            if (resourceId > 0) {
+                //根据资源ID获取响应的尺寸值
+                starusBarHeight = context.getResources().getDimensionPixelSize(resourceId);
+            }
         }
-        return statusBarHeight;
+        return starusBarHeight;
     }
 }
