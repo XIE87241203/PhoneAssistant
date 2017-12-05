@@ -25,4 +25,7 @@
     <string name="phone_state_float_sdcard_rom_state">SDcard：%s</string>
     <string name="phone_state_float_download_speed">下载：%s</string>
     <string name="phone_state_float_upload_speed">上传：%s</string>
+    <!--红包提醒-->
+    <string name="red_envelope_desc">手机助手-微信红包提醒</string>
+    <string name="red_envelope_auto_click">发现红包自动进入聊天会话页面</string>
 </resources>
