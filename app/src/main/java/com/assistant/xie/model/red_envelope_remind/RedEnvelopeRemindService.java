@@ -3,6 +3,10 @@ package com.assistant.xie.model.red_envelope_remind;
 import android.accessibilityservice.AccessibilityService;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.util.Log;
@@ -11,6 +15,8 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.assistant.xie.R;
 import com.assistant.xie.Utils.ScreenListener;
+import com.assistant.xie.Utils.SharePreferenceUtils;
+import com.assistant.xie.service.FloatWindowService;
 
 import java.util.List;
 
@@ -19,11 +25,15 @@ import java.util.List;
  * 抢红包服务
  */
 
-public class RedEnvelopeRemindService extends AccessibilityService{
+public class RedEnvelopeRemindService extends AccessibilityService {
     private boolean isScreenOff = false;//判断是否处于锁屏状态
+    private boolean isAutoClick = false;//判断是否自动进入会话
     private ScreenListener screenListener;
     private SoundPool soundPool;
     private int red_envelope_id;//音频id
+    private RedEnvelopeRemindReceiver remindReceiver;
+    private boolean isReminding = false;//打开红包中标记，防止重复打开
+
 
     @Override
     protected void onServiceConnected() {
@@ -49,6 +59,10 @@ public class RedEnvelopeRemindService extends AccessibilityService{
                 isScreenOff = false;
             }
         });
+        //注册广播接收器
+        remindReceiver = new RedEnvelopeRemindReceiver();
+        registerReceiver(remindReceiver, new IntentFilter("com.assistant.xie.RED_ENVELOPE_REMIND_REFRESH_SETTING"));
+        loadSetting();
     }
 
     @Override
@@ -61,21 +75,23 @@ public class RedEnvelopeRemindService extends AccessibilityService{
                 if (!texts.isEmpty()) {
                     for (CharSequence text : texts) {
                         String content = text.toString();
-                        if (content.contains("[微信红包]")) {
-                            if(isScreenOff){
-                                //锁屏情况下播放声音
-                                soundPool.play(red_envelope_id, 1, 1, 0, 0, 1);
-                            }else{
+                        if (content.contains("[微信红包]") && !isReminding) {
+                            if (isAutoClick) {
                                 //模拟打开通知栏消息
                                 if (event.getParcelableData() != null && event.getParcelableData() instanceof Notification) {
                                     Notification notification = (Notification) event.getParcelableData();
                                     PendingIntent pendingIntent = notification.contentIntent;
                                     try {
                                         pendingIntent.send();
+                                        isReminding = true;
                                     } catch (PendingIntent.CanceledException e) {
                                         e.printStackTrace();
                                     }
                                 }
+                            }
+                            if (isScreenOff || !isAutoClick) {
+                                //锁屏和不点击情况下播放声音
+                                soundPool.play(red_envelope_id, 1, 1, 0, 0, 1);
                             }
                         }
                     }
@@ -84,9 +100,10 @@ public class RedEnvelopeRemindService extends AccessibilityService{
             //第二步：监听是否进入微信红包消息界面
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
                 String className = event.getClassName().toString();
-                if (className.equals("com.tencent.mm.ui.LauncherUI")) {
+                if (className.equals("com.tencent.mm.ui.LauncherUI") && isReminding) {
                     //打开聊天页面
                     getPacket();
+                    isReminding = false;
                 }
 //                else if (className.equals("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyReceiveUI")) {
 //                    //开始打开红包
@@ -107,34 +124,33 @@ public class RedEnvelopeRemindService extends AccessibilityService{
      *
      * @param info info
      */
-    public void recycle(AccessibilityNodeInfo info) {
+    public boolean recycle(AccessibilityNodeInfo info) {
         if (info.getChildCount() == 0) {
             if (info.getText() != null) {
                 if ("领取红包".equals(info.getText().toString())) {
                     //这里有一个问题需要注意，就是需要找到一个可以点击的View
-                    Log.i("demo", "Click" + ",isClick:" + info.isClickable());
                     info.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                     AccessibilityNodeInfo parent = info.getParent();
                     while (parent != null) {
-                        Log.i("demo", "parent isClick:" + parent.isClickable());
                         //点击领取红包
                         if (parent.isClickable()) {
                             parent.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                            break;
+                            return true;
                         }
                         parent = parent.getParent();
                     }
 
                 }
             }
-
+            return false;
         } else {
             //循环获取领取红包的View
-            for (int i = 0; i < info.getChildCount(); i++) {
-                if (info.getChild(i) != null) {
-                    recycle(info.getChild(i));
+            for (int i = info.getChildCount() - 1; i >= 0; i--) {
+                if (info.getChild(i) != null && recycle(info.getChild(i))) {
+                    return true;
                 }
             }
+            return false;
         }
     }
 
@@ -153,10 +169,22 @@ public class RedEnvelopeRemindService extends AccessibilityService{
 
     }
 
+    public class RedEnvelopeRemindReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            loadSetting();
+        }
+    }
+
+    private void loadSetting() {
+        isAutoClick = SharePreferenceUtils.loadBooleanData(getApplicationContext(), SharePreferenceUtils.SAVE_NAME_RED_ENVELOPE_REMIND, RedEnvelopeRemindStaticConstants.SAVE_KEY_1_AUTO_CLICK, false);
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         screenListener.unregister();
+        unregisterReceiver(remindReceiver);
     }
 
     @Override

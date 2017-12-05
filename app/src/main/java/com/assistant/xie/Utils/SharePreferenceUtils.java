@@ -13,6 +13,7 @@ import java.util.Map;
 
 public class SharePreferenceUtils {
     public final static String SAVE_NAME_PHONE_STATE = "share_preference_phone_state";
+    public final static String SAVE_NAME_RED_ENVELOPE_REMIND = "share_preference_red_envelope_remind";
 
     /**
      * 缓存字符串数据
