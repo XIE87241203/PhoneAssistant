@@ -10,6 +10,5 @@
         android:layout_height="wrap_content"
         android:textColor="#ffffff"
         android:textSize="13sp"
-        android:padding="1dp"
-        android:text="@string/text_holder"/>
+        android:padding="1dp"/>
 </LinearLayout>

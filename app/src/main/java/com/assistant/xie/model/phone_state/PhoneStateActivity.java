@@ -41,8 +41,8 @@ public class PhoneStateActivity extends AppCompatActivity implements CompoundBut
         setContentView(R.layout.activity_phone_state);
         requestSDCardPermission();
         initView();
-        initData();
         initListener();
+        initData();
         //注册广播接收器
         receiver = new RefreshPhoneStateReceiver();
         registerReceiver(receiver, new IntentFilter("com.assistant.xie.REFRESH_PHONE_STATE"));
@@ -83,18 +83,9 @@ public class PhoneStateActivity extends AppCompatActivity implements CompoundBut
                 switchMap.get(entry.getKey()).setChecked(true);
             }
         }
-        //全选
-        ViewGroup parent = (ViewGroup) sw_float_window.getParent();
-        sw_float_window.setChecked(true);
-        for (int i = 0; i < parent.getChildCount(); i++) {
-            if (parent.getChildAt(i) instanceof Switch && !((Switch) parent.getChildAt(i)).isChecked()) {
-                sw_float_window.setChecked(false);
-                break;
-            }
-        }
     }
 
-    private void initListener(){
+    private void initListener() {
         sw_float_window.setOnCheckedChangeListener(this);
         //设置tag
         for (Map.Entry<String, Switch> entry : switchMap.entrySet()) {
@@ -125,24 +116,14 @@ public class PhoneStateActivity extends AppCompatActivity implements CompoundBut
                 break;
             default:
                 SharePreferenceUtils.saveBooleanData(this, SharePreferenceUtils.SAVE_NAME_PHONE_STATE, (String) buttonView.getTag(), isChecked);
-                if(!isChecked) {
+                if (!isChecked) {
                     //关闭全选
                     sw_float_window.setOnCheckedChangeListener(null);
                     sw_float_window.setChecked(false);
                     sw_float_window.setOnCheckedChangeListener(this);
-                }else{
+                } else {
                     //判断开启全选
-                    //全选
-                    boolean isAllTrue = true;
-                    for (int i = 0; i < parent.getChildCount(); i++) {
-                        if (parent.getChildAt(i) instanceof Switch && parent.getChildAt(i).getId() != R.id.sw_float_window) {
-                            if(!((Switch) parent.getChildAt(i)).isChecked()){
-                                isAllTrue = false;
-                                break;
-                            }
-                        }
-                    }
-                    if(isAllTrue){
+                    if (getSelectState() == 1) {
                         sw_float_window.setOnCheckedChangeListener(null);
                         sw_float_window.setChecked(true);
                         sw_float_window.setOnCheckedChangeListener(this);
@@ -268,9 +249,39 @@ public class PhoneStateActivity extends AppCompatActivity implements CompoundBut
         }
     }
 
+    /**
+     * 获取选择状态
+     *
+     * @return 1：全选 2：全部没选中 3：部分选中
+     */
+    private int getSelectState() {
+        ViewGroup parent = (ViewGroup) sw_float_window.getParent();
+        int checkNum = 0;
+        int switchNum = 0;
+        for (int i = 0; i < parent.getChildCount(); i++) {
+            if (parent.getChildAt(i) instanceof Switch && parent.getChildAt(i).getId() != R.id.sw_float_window) {
+                if (((Switch) parent.getChildAt(i)).isChecked()) {
+                    checkNum++;
+                }
+                switchNum++;
+            }
+        }
+        if (checkNum == 0) {
+            return 2;
+        } else if (switchNum == checkNum) {
+            return 1;
+        } else {
+            return 3;
+        }
+    }
+
     @Override
     protected void onDestroy() {
         unregisterReceiver(receiver);
+        if (getSelectState() == 2) {
+            Intent intent = new Intent(this, FloatWindowService.class);
+            stopService(intent);
+        }
         super.onDestroy();
     }
 }

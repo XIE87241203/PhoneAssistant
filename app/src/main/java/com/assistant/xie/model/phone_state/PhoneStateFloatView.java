@@ -43,18 +43,11 @@ public class PhoneStateFloatView extends LinearLayout implements View.OnClickLis
         switchList = new ArrayList<>();
         setOnClickListener(this);
         refreshView();
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
         //注册电池广播
         PhoneStateUtils.getInstance().registerBatteryBroadcast(getContext());
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
+    public void unregisterBatteryBroadcast(){
         //反注册电池广播
         PhoneStateUtils.getInstance().unregisterBatteryBroadcast(getContext());
     }
@@ -62,15 +55,6 @@ public class PhoneStateFloatView extends LinearLayout implements View.OnClickLis
     public void refreshView() {
         //从缓存中读取开关信息
         Map<String, Boolean> switchMap = PhoneStateUtils.getInstance().getSaveData(getContext());
-        if (!switchMap.isEmpty()) {
-            if (!switchMap.isEmpty()) {
-                //如果有开了的开关
-                refreshMsg();
-                open();
-            } else {
-                close();
-            }
-        }
         //获取打开的tag
         List<String> saveTag = PhoneStateUtils.getInstance().getSaveTagList();
         switchList.clear();
@@ -85,36 +69,36 @@ public class PhoneStateFloatView extends LinearLayout implements View.OnClickLis
         } else {
             open();
         }
-
+        refreshMsg();
     }
 
     /**
      * 刷新状态信息
      */
     public void refreshMsg() {
+        String upload_speed = PhoneStateUtils.getInstance().getTxNetSpeed(FloatWindowService.REFRESH_TIME);
+        String download_speed = PhoneStateUtils.getInstance().getRxNetSpeed(FloatWindowService.REFRESH_TIME);
+        String ram_static = PhoneStateUtils.getInstance().getAvailMemory(getContext()) + "/" + PhoneStateUtils.getInstance().getTotalMemory(getContext());
+        String battery_static = PhoneStateUtils.getInstance().getBatteryStatus();
+        String battery_capacity = PhoneStateUtils.getInstance().getBattery();
+        String battery_voltage = PhoneStateUtils.getInstance().getBatteryV();
+        String battery_temperature = PhoneStateUtils.getInstance().getBatteryT();
+        String rom_state = PhoneStateUtils.getInstance().getROMUsageStatus(getContext());
+        String sdcard_rom_state = PhoneStateUtils.getInstance().getSDUsageStatus(getContext());
+        //发送广播更新activity
+        Intent counterIntent = new Intent();
+        counterIntent.putExtra("upload_speed", upload_speed);
+        counterIntent.putExtra("download_speed", download_speed);
+        counterIntent.putExtra("ram_static", ram_static);
+        counterIntent.putExtra("battery_static", battery_static);
+        counterIntent.putExtra("battery_capacity", battery_capacity);
+        counterIntent.putExtra("battery_voltage", battery_voltage);
+        counterIntent.putExtra("battery_temperature", battery_temperature);
+        counterIntent.putExtra("rom_state", rom_state);
+        counterIntent.putExtra("sdcard_rom_state", sdcard_rom_state);
+        counterIntent.setAction("com.assistant.xie.REFRESH_PHONE_STATE");
+        getContext().sendBroadcast(counterIntent);
         if (isAttachedToWindow()) {
-            String upload_speed = PhoneStateUtils.getInstance().getTxNetSpeed(FloatWindowService.REFRESH_TIME);
-            String download_speed = PhoneStateUtils.getInstance().getRxNetSpeed(FloatWindowService.REFRESH_TIME);
-            String ram_static = PhoneStateUtils.getInstance().getAvailMemory(getContext()) + "/" + PhoneStateUtils.getInstance().getTotalMemory(getContext());
-            String battery_static = PhoneStateUtils.getInstance().getBatteryStatus();
-            String battery_capacity = PhoneStateUtils.getInstance().getBattery();
-            String battery_voltage = PhoneStateUtils.getInstance().getBatteryV();
-            String battery_temperature = PhoneStateUtils.getInstance().getBatteryT();
-            String rom_state = PhoneStateUtils.getInstance().getROMUsageStatus(getContext());
-            String sdcard_rom_state = PhoneStateUtils.getInstance().getSDUsageStatus(getContext());
-            //发送广播更新activity
-            Intent counterIntent = new Intent();
-            counterIntent.putExtra("upload_speed", upload_speed);
-            counterIntent.putExtra("download_speed", download_speed);
-            counterIntent.putExtra("ram_static", ram_static);
-            counterIntent.putExtra("battery_static", battery_static);
-            counterIntent.putExtra("battery_capacity", battery_capacity);
-            counterIntent.putExtra("battery_voltage", battery_voltage);
-            counterIntent.putExtra("battery_temperature", battery_temperature);
-            counterIntent.putExtra("rom_state", rom_state);
-            counterIntent.putExtra("sdcard_rom_state", sdcard_rom_state);
-            counterIntent.setAction("com.assistant.xie.REFRESH_PHONE_STATE");
-            getContext().sendBroadcast(counterIntent);
             //隐藏时保留框大小
             if (!switchList.isEmpty() && isOpen && !isHide) {
                 StringBuilder msg = new StringBuilder();
