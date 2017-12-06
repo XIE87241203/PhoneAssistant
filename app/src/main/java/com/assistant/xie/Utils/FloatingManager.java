@@ -15,7 +15,7 @@ public class FloatingManager {
 
     public static FloatingManager getInstance(Context context) {
         if (mInstance == null) {
-            mInstance = new FloatingManager(context);
+            mInstance = new FloatingManager(context.getApplicationContext());
         }
         return mInstance;
     }
