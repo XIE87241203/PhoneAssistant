@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.text.format.Formatter;
 import android.util.Log;
 
+import com.assistant.xie.Utils.CommonMethods;
 import com.assistant.xie.Utils.SharePreferenceUtils;
 import com.assistant.xie.model.main.MainActivity;
 
@@ -55,10 +56,11 @@ class PhoneStateUtils {
 
     /**
      * 获取手机状态开关缓存
+     *
      * @param context context
      * @return Map<String,Boolean>
      */
-    synchronized Map<String,Boolean> getSaveData(Context context){
+    synchronized Map<String, Boolean> getSaveData(Context context) {
         //获取所有变量的值
         HashMap<String, Boolean> map = new HashMap<>();
         try {
@@ -77,9 +79,10 @@ class PhoneStateUtils {
 
     /**
      * 获取手机状态开关缓存
+     *
      * @return List<String>
      */
-    synchronized List<String> getSaveTagList(){
+    synchronized List<String> getSaveTagList() {
         //获取所有变量的值
         List<String> result = new ArrayList<>();
         try {
@@ -102,22 +105,12 @@ class PhoneStateUtils {
      *
      * @return 相对于上次下载的数据量
      */
-    synchronized String getRxNetSpeed(int refreshTime) {
-        DecimalFormat decimalFormat = new DecimalFormat("0.##");
+    synchronized String getRxNetSpeed(Context context, int refreshTime) {
         long nowTotalRxBytes = TrafficStats.getTotalRxBytes() == TrafficStats.UNSUPPORTED ? 0 : (TrafficStats.getTotalRxBytes());//转为KB
-        String unit = "B/s";
-        String result = "0";
+        String result = "0B/s";
         if (lastTotalRxBytes != 0 && refreshTime / 1000 != 0) {
-            double speed = (nowTotalRxBytes - lastTotalRxBytes) / (refreshTime / 1000);
-            if (speed > 1024) {
-                speed = speed / 1024;
-                unit = "K/s";
-            }
-            if (speed > 1024) {
-                speed = speed / 1024;
-                unit = "M/s";
-            }
-            result = decimalFormat.format(speed) + unit;
+            long speed = (nowTotalRxBytes - lastTotalRxBytes) / (refreshTime / 1000);
+            result = Formatter.formatFileSize(context, speed) + "/s";
         }
         lastTotalRxBytes = nowTotalRxBytes;
         return result;
@@ -129,22 +122,12 @@ class PhoneStateUtils {
      *
      * @return 相对于上次上传的数据量
      */
-    synchronized String getTxNetSpeed(int refreshTime) {
-        DecimalFormat decimalFormat = new DecimalFormat("0.##");
+    synchronized String getTxNetSpeed(Context context, int refreshTime) {
         long nowTotalTxBytes = TrafficStats.getTotalTxBytes() == TrafficStats.UNSUPPORTED ? 0 : (TrafficStats.getTotalTxBytes());//转为KB
-        String unit = "B/s";
-        String result = "0" + unit;
+        String result = "0B/s";
         if (lastTotalTxBytes != 0 && refreshTime / 1000 != 0) {
-            double speed = (nowTotalTxBytes - lastTotalTxBytes) / (refreshTime / 1000);
-            if (speed > 1024) {
-                speed = speed / 1024;
-                unit = "K/s";
-            }
-            if (speed > 1024) {
-                speed = speed / 1024;
-                unit = "M/s";
-            }
-            result = decimalFormat.format(speed) + unit;
+            long speed = (nowTotalTxBytes - lastTotalTxBytes) / (refreshTime / 1000);
+            result = Formatter.formatFileSize(context, speed) + "/s";
         }
         lastTotalTxBytes = nowTotalTxBytes;
         return result;

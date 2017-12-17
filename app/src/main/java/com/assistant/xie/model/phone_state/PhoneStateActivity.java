@@ -23,7 +23,6 @@ import android.widget.Switch;
 import com.assistant.xie.R;
 import com.assistant.xie.Utils.CommonMethods;
 import com.assistant.xie.Utils.SharePreferenceUtils;
-import com.assistant.xie.service.FloatWindowService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -83,6 +82,10 @@ public class PhoneStateActivity extends AppCompatActivity implements CompoundBut
                 switchMap.get(entry.getKey()).setChecked(true);
             }
         }
+        //发送广播通知更新activity信息
+        Intent counterIntent = new Intent();
+        counterIntent.setAction(FloatWindowService.ACTION_PHONE_STATE_ACTIVITY_OPEN);
+        sendBroadcast(counterIntent);
     }
 
     private void initListener() {
@@ -134,7 +137,7 @@ public class PhoneStateActivity extends AppCompatActivity implements CompoundBut
 
         //发送广播更新悬浮窗
         Intent counterIntent = new Intent();
-        counterIntent.setAction("com.assistant.xie.REFRESH_FLOAT_VIEW");
+        counterIntent.setAction(FloatWindowService.ACTION_REFRESH_FLOAT_VIEW);
         sendBroadcast(counterIntent);
     }
 
@@ -281,6 +284,11 @@ public class PhoneStateActivity extends AppCompatActivity implements CompoundBut
         if (getSelectState() == 2) {
             Intent intent = new Intent(this, FloatWindowService.class);
             stopService(intent);
+        }else{
+            //发送广播通知更新activity信息
+            Intent counterIntent = new Intent();
+            counterIntent.setAction(FloatWindowService.ACTION_PHONE_STATE_ACTIVITY_CLOSE);
+            sendBroadcast(counterIntent);
         }
         super.onDestroy();
     }

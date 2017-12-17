@@ -1,4 +1,4 @@
-package com.assistant.xie.service;
+package com.assistant.xie.model.phone_state;
 
 import android.app.ActivityManager;
 import android.app.Service;
@@ -12,8 +12,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
-
-import com.assistant.xie.model.phone_state.PhoneStateFloatView;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -31,6 +29,10 @@ public class FloatWindowService extends Service {
     public static final int REFRESH_TIME = 2000;
     private static final int HANDLER_WHAT_REFRESH_MSG = 1;
     private static final int HANDLER_WHAT_REFRESH_VIEW = 2;
+    public static final String ACTION_REFRESH_FLOAT_VIEW = "com.assistant.xie.REFRESH_FLOAT_VIEW";
+    public static final String ACTION_PHONE_STATE_ACTIVITY_CLOSE = "com.assistant.xie.PHONE_STATE_ACTIVITY_CLOSE";
+    public static final String ACTION_PHONE_STATE_ACTIVITY_OPEN = "com.assistant.xie.PHONE_STATE_ACTIVITY_OPEN";
+
     /**
      * 定时器，定时进行检测当前应该创建还是移除悬浮窗。
      */
@@ -54,7 +56,9 @@ public class FloatWindowService extends Service {
         phoneStateFloatView = new PhoneStateFloatView(getApplicationContext());
         //注册广播接收器
         receiver = new RefreshFloatViewReceiver();
-        registerReceiver(receiver, new IntentFilter("com.assistant.xie.REFRESH_FLOAT_VIEW"));
+        registerReceiver(receiver, new IntentFilter(ACTION_REFRESH_FLOAT_VIEW));
+        registerReceiver(receiver, new IntentFilter(ACTION_PHONE_STATE_ACTIVITY_CLOSE));
+        registerReceiver(receiver, new IntentFilter(ACTION_PHONE_STATE_ACTIVITY_OPEN));
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -86,7 +90,19 @@ public class FloatWindowService extends Service {
     public class RefreshFloatViewReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            handler.sendEmptyMessage(HANDLER_WHAT_REFRESH_VIEW);
+            if (intent.getAction() != null) {
+                switch (intent.getAction()) {
+                    case ACTION_REFRESH_FLOAT_VIEW:
+                        handler.sendEmptyMessage(HANDLER_WHAT_REFRESH_VIEW);
+                        break;
+                    case ACTION_PHONE_STATE_ACTIVITY_OPEN:
+                        phoneStateFloatView.setActivityOpen(true);
+                        break;
+                    case ACTION_PHONE_STATE_ACTIVITY_CLOSE:
+                        phoneStateFloatView.setActivityOpen(false);
+                        break;
+                }
+            }
         }
     }
 

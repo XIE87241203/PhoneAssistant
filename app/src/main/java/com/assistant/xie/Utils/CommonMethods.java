@@ -6,6 +6,7 @@ import android.content.Context;
 import android.util.Log;
 import android.view.accessibility.AccessibilityManager;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import static android.content.Context.ACTIVITY_SERVICE;
@@ -16,6 +17,15 @@ import static android.content.Context.ACTIVITY_SERVICE;
  */
 
 public class CommonMethods {
+
+    /**
+     * 判断字符串是否为null或为""
+     * @param str String
+     * @return boolean
+     */
+    public static boolean isEmptyString(String str){
+        return str == null || str.equals("");
+    }
 
     /**
      * 判断某个服务是否正在运行的方法
@@ -57,5 +67,29 @@ public class CommonMethods {
             }
         }
         return false;
+    }
+
+    /**
+     * 数据单位自动向上转换，最小为B，最大为GB
+     * @param dataSize
+     * @return
+     */
+    public static String dataUnitConversion(long dataSize){
+        DecimalFormat decimalFormat = new DecimalFormat("0.##");
+        double dataSizeD = dataSize;
+        String unit = "B";
+        if(dataSizeD>500){
+            dataSizeD = dataSizeD/1024;
+            unit = "KB";
+        }
+        if(dataSizeD>500){
+            dataSizeD = dataSizeD/1024;
+            unit = "M";
+        }
+        if(dataSizeD>500){
+            dataSizeD = dataSizeD/1024;
+            unit = "G";
+        }
+        return decimalFormat.format(dataSizeD) + unit;
     }
 }

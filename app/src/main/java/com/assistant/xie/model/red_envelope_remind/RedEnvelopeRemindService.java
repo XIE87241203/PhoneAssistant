@@ -9,14 +9,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.SoundPool;
-import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.assistant.xie.R;
 import com.assistant.xie.Utils.ScreenListener;
 import com.assistant.xie.Utils.SharePreferenceUtils;
-import com.assistant.xie.service.FloatWindowService;
 
 import java.util.List;
 

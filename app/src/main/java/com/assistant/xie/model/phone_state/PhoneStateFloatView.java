@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -16,7 +15,6 @@ import android.widget.TextView;
 import com.assistant.xie.R;
 import com.assistant.xie.Utils.DisplayUtil;
 import com.assistant.xie.Utils.FloatingManager;
-import com.assistant.xie.service.FloatWindowService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +32,7 @@ public class PhoneStateFloatView extends LinearLayout implements View.OnClickLis
     private boolean isHide = false;
     private List<String> switchList;
     private WindowManager.LayoutParams params;
+    private boolean isActivityOpen = true;//判断手机状态页面是否开启
 
     public PhoneStateFloatView(Context context) {
         super(context);
@@ -47,7 +46,7 @@ public class PhoneStateFloatView extends LinearLayout implements View.OnClickLis
         PhoneStateUtils.getInstance().registerBatteryBroadcast(getContext());
     }
 
-    public void unregisterBatteryBroadcast(){
+    public void unregisterBatteryBroadcast() {
         //反注册电池广播
         PhoneStateUtils.getInstance().unregisterBatteryBroadcast(getContext());
     }
@@ -76,28 +75,39 @@ public class PhoneStateFloatView extends LinearLayout implements View.OnClickLis
      * 刷新状态信息
      */
     public void refreshMsg() {
-        String upload_speed = PhoneStateUtils.getInstance().getTxNetSpeed(FloatWindowService.REFRESH_TIME);
-        String download_speed = PhoneStateUtils.getInstance().getRxNetSpeed(FloatWindowService.REFRESH_TIME);
-        String ram_static = PhoneStateUtils.getInstance().getAvailMemory(getContext()) + "/" + PhoneStateUtils.getInstance().getTotalMemory(getContext());
-        String battery_static = PhoneStateUtils.getInstance().getBatteryStatus();
-        String battery_capacity = PhoneStateUtils.getInstance().getBattery();
-        String battery_voltage = PhoneStateUtils.getInstance().getBatteryV();
-        String battery_temperature = PhoneStateUtils.getInstance().getBatteryT();
-        String rom_state = PhoneStateUtils.getInstance().getROMUsageStatus(getContext());
-        String sdcard_rom_state = PhoneStateUtils.getInstance().getSDUsageStatus(getContext());
-        //发送广播更新activity
-        Intent counterIntent = new Intent();
-        counterIntent.putExtra("upload_speed", upload_speed);
-        counterIntent.putExtra("download_speed", download_speed);
-        counterIntent.putExtra("ram_static", ram_static);
-        counterIntent.putExtra("battery_static", battery_static);
-        counterIntent.putExtra("battery_capacity", battery_capacity);
-        counterIntent.putExtra("battery_voltage", battery_voltage);
-        counterIntent.putExtra("battery_temperature", battery_temperature);
-        counterIntent.putExtra("rom_state", rom_state);
-        counterIntent.putExtra("sdcard_rom_state", sdcard_rom_state);
-        counterIntent.setAction("com.assistant.xie.REFRESH_PHONE_STATE");
-        getContext().sendBroadcast(counterIntent);
+        String upload_speed = null;
+        String download_speed = null;
+        String ram_static = null;
+        String battery_static = null;
+        String battery_capacity = null;
+        String battery_voltage = null;
+        String battery_temperature = null;
+        String rom_state = null;
+        String sdcard_rom_state = null;
+        if (isActivityOpen) {
+            upload_speed = PhoneStateUtils.getInstance().getTxNetSpeed(getContext(), FloatWindowService.REFRESH_TIME);
+            download_speed = PhoneStateUtils.getInstance().getRxNetSpeed(getContext(), FloatWindowService.REFRESH_TIME);
+            ram_static = PhoneStateUtils.getInstance().getAvailMemory(getContext()) + "/" + PhoneStateUtils.getInstance().getTotalMemory(getContext());
+            battery_static = PhoneStateUtils.getInstance().getBatteryStatus();
+            battery_capacity = PhoneStateUtils.getInstance().getBattery();
+            battery_voltage = PhoneStateUtils.getInstance().getBatteryV();
+            battery_temperature = PhoneStateUtils.getInstance().getBatteryT();
+            rom_state = PhoneStateUtils.getInstance().getROMUsageStatus(getContext());
+            sdcard_rom_state = PhoneStateUtils.getInstance().getSDUsageStatus(getContext());
+            //发送广播更新activity
+            Intent counterIntent = new Intent();
+            counterIntent.putExtra("upload_speed", upload_speed);
+            counterIntent.putExtra("download_speed", download_speed);
+            counterIntent.putExtra("ram_static", ram_static);
+            counterIntent.putExtra("battery_static", battery_static);
+            counterIntent.putExtra("battery_capacity", battery_capacity);
+            counterIntent.putExtra("battery_voltage", battery_voltage);
+            counterIntent.putExtra("battery_temperature", battery_temperature);
+            counterIntent.putExtra("rom_state", rom_state);
+            counterIntent.putExtra("sdcard_rom_state", sdcard_rom_state);
+            counterIntent.setAction("com.assistant.xie.REFRESH_PHONE_STATE");
+            getContext().sendBroadcast(counterIntent);
+        }
         if (isAttachedToWindow()) {
             //隐藏时保留框大小
             if (!switchList.isEmpty() && isOpen && !isHide) {
@@ -105,30 +115,57 @@ public class PhoneStateFloatView extends LinearLayout implements View.OnClickLis
                 for (String tag : switchList) {
                     switch (tag) {
                         case PhoneStateStaticConstants.SAVE_KEY_2_UPLOAD_SPEED:
+                            if (upload_speed == null) {
+                                upload_speed = PhoneStateUtils.getInstance().getTxNetSpeed(getContext(), FloatWindowService.REFRESH_TIME);
+                            }
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_upload_speed), upload_speed));
                             break;
                         case PhoneStateStaticConstants.SAVE_KEY_3_DOWNLOAD_SPEED:
+                            if (download_speed == null) {
+                                download_speed = PhoneStateUtils.getInstance().getRxNetSpeed(getContext(), FloatWindowService.REFRESH_TIME);
+                            }
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_download_speed), download_speed));
                             break;
                         case PhoneStateStaticConstants.SAVE_KEY_1_RAM_STATIC:
+                            if (ram_static == null) {
+                                ram_static = PhoneStateUtils.getInstance().getAvailMemory(getContext()) + "/" + PhoneStateUtils.getInstance().getTotalMemory(getContext());
+                            }
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_ram_static), ram_static));
                             break;
                         case PhoneStateStaticConstants.SAVE_KEY_4_BATTERY_STATIC:
+                            if (battery_static == null) {
+                                battery_static = PhoneStateUtils.getInstance().getBatteryStatus();
+                            }
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_battery_static), battery_static));
                             break;
                         case PhoneStateStaticConstants.SAVE_KEY_5_BATTERY_CAPACITY:
+                            if (battery_capacity == null) {
+                                battery_capacity = PhoneStateUtils.getInstance().getBattery();
+                            }
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_battery_capacity), battery_capacity));
                             break;
                         case PhoneStateStaticConstants.SAVE_KEY_6_BATTERY_VOLTAGE:
+                            if (battery_voltage == null) {
+                                battery_voltage = PhoneStateUtils.getInstance().getBatteryV();
+                            }
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_battery_voltage), battery_voltage));
                             break;
                         case PhoneStateStaticConstants.SAVE_KEY_7_BATTERY_TEMPERATURE:
+                            if (battery_temperature == null) {
+                                battery_temperature = PhoneStateUtils.getInstance().getBatteryT();
+                            }
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_battery_temperature), battery_temperature));
                             break;
                         case PhoneStateStaticConstants.SAVE_KEY_8_ROM_STATE:
+                            if (rom_state == null) {
+                                rom_state = PhoneStateUtils.getInstance().getROMUsageStatus(getContext());
+                            }
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_rom_state), rom_state));
                             break;
                         case PhoneStateStaticConstants.SAVE_KEY_9_SDCARD_ROM_STATE:
+                            if (sdcard_rom_state == null) {
+                                sdcard_rom_state = PhoneStateUtils.getInstance().getSDUsageStatus(getContext());
+                            }
                             msg.append(String.format(getResources().getString(R.string.phone_state_float_sdcard_rom_state), sdcard_rom_state));
                             break;
                     }
@@ -248,5 +285,9 @@ public class PhoneStateFloatView extends LinearLayout implements View.OnClickLis
                 }
         }
         return super.onTouchEvent(event);
+    }
+
+    public void setActivityOpen(boolean activityOpen) {
+        isActivityOpen = activityOpen;
     }
 }

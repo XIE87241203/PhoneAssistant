@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
+    <uses-permission android:name="android.permission.GET_PACKAGE_SIZE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
     <application
         android:name=".MyApplication"
@@ -31,7 +33,7 @@
         </activity>
         <activity android:name=".model.phone_state.PhoneStateActivity" />
 
-        <service android:name=".service.FloatWindowService" />
+        <service android:name=".model.phone_state.FloatWindowService" />
         <service
             android:name=".model.red_envelope_remind.RedEnvelopeRemindService"
             android:enabled="true"
