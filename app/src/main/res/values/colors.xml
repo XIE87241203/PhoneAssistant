@@ -6,6 +6,5 @@
     <color name="defaultTextColor">#000000</color>
     <color name="defaultItemColor">#ffffff</color>
     <color name="defaultBackgroundColor">#f1f1f1</color>
-    <color name="floatWindowBackground">#66000000</color>
     <color name="divideColor">#d1d1d1</color>
 </resources>

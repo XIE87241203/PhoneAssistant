@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/floatWindowBackground">
+    android:background="@drawable/bg_radius_66000000_10dp">
 
     <TextView
         android:id="@+id/tv_msg"
@@ -10,5 +10,8 @@
         android:layout_height="wrap_content"
         android:textColor="#ffffff"
         android:textSize="13sp"
-        android:padding="1dp"/>
+        android:paddingEnd="5dp"
+        android:paddingStart="5dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"/>
 </LinearLayout>
