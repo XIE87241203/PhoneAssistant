@@ -3,6 +3,7 @@
     <string name="title_activity_base_action_bar">BaseActionBarActivity</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="text_holder">text_holder</string>
+    <string name="text_net_error">网络连接失败，请点击刷新!</string>
 
     <!--手机状态页面-->
     <string name="phone_state_all_show_float_window">全部显示到悬浮窗</string>
@@ -28,4 +29,7 @@
     <!--红包提醒-->
     <string name="red_envelope_desc">手机助手-微信红包提醒</string>
     <string name="red_envelope_auto_click">发现红包自动进入聊天会话页面</string>
+    <!--新闻-->
+    <!--网易新闻-->
+    <string name="news_netease_comment_count">评论:%s条</string>
 </resources>

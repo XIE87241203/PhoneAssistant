@@ -10,8 +10,9 @@ import android.widget.Toast;
 import com.assistant.xie.R;
 import com.assistant.xie.Utils.CommonMethods;
 import com.assistant.xie.Utils.SharePreferenceUtils;
+import com.assistant.xie.model.base.BaseActivity;
 
-public class RedEnvelopeRemindActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
+public class RedEnvelopeRemindActivity extends BaseActivity implements CompoundButton.OnCheckedChangeListener {
     private Switch sw_auto_click;
 
     @Override

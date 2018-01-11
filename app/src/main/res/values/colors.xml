@@ -7,4 +7,9 @@
     <color name="defaultItemColor">#ffffff</color>
     <color name="defaultBackgroundColor">#f1f1f1</color>
     <color name="divideColor">#d1d1d1</color>
+    <color name="defaultImageHolderColor">#ffffff</color>
+
+    <!--网易新闻模块-->
+    <color name="news_netease_item_title_text_color">#404040</color>
+    <color name="news_netease_item_dec_text_color">#888888</color>
 </resources>

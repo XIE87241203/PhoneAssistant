@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="top"
+    android:orientation="vertical"
+    android:paddingEnd="@dimen/news_netease_item3_horizontal_padding"
+    android:background="@color/defaultItemColor"
+    android:paddingStart="@dimen/news_netease_item3_horizontal_padding">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:paddingBottom="@dimen/news_netease_item3_title_vertical_padding"
+        android:paddingTop="@dimen/news_netease_item3_title_vertical_padding"
+        android:text="@string/text_holder"
+        android:textColor="@color/news_netease_item_title_text_color"
+        android:textSize="@dimen/news_netease_item3_title_text_size" />
+
+    <ImageView
+        android:id="@+id/iv_image"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/news_netease_item3_img_height"
+        android:scaleType="centerCrop"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="@dimen/news_netease_item3_dec_vertical_padding"
+        android:paddingTop="@dimen/news_netease_item3_dec_vertical_padding">
+
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:text="1小时前"
+            android:textColor="@color/news_netease_item_dec_text_color"
+            android:textSize="@dimen/news_netease_item3_dec_text_size" />
+
+        <TextView
+            android:id="@+id/tv_comment_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="@string/news_netease_comment_count"
+            android:textColor="@color/news_netease_item_dec_text_color"
+            android:textSize="@dimen/news_netease_item3_dec_text_size" />
+    </LinearLayout>
+</LinearLayout>

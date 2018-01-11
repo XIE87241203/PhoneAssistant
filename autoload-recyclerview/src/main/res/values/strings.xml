@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">AutoLoadRecyclerView</string>
+    <string name="footer_hint_normal">― 没有更多了 ―</string>
+</resources>

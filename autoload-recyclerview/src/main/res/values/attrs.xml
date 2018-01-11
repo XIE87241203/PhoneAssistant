@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="FunctionalRecyclerLayout">
+        <!-- RecyclerView类型 -->
+        <attr name="recycler_type" format="enum">
+            <enum name="linear_vertical" value="1" />
+            <enum name="staggeredGrid_vertical" value="2" />
+            <enum name="grid_vertical" value="3" />
+        </attr>
+    </declare-styleable>
+</resources>

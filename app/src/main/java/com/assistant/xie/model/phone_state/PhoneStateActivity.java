@@ -23,11 +23,12 @@ import android.widget.Switch;
 import com.assistant.xie.R;
 import com.assistant.xie.Utils.CommonMethods;
 import com.assistant.xie.Utils.SharePreferenceUtils;
+import com.assistant.xie.model.base.BaseActivity;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class PhoneStateActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
+public class PhoneStateActivity extends BaseActivity implements CompoundButton.OnCheckedChangeListener {
     private Switch sw_float_window, sw_upload_speed, sw_download_speed, sw_ram_static, sw_battery_static, sw_battery_capacity, sw_battery_voltage,
             sw_battery_temperature, sw_rom_state, sw_sdcard_rom_state;
     private RefreshPhoneStateReceiver receiver;

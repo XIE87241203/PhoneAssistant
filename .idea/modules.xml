@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/autoload-recyclerview/autoload-recyclerview.iml" filepath="$PROJECT_DIR$/autoload-recyclerview/autoload-recyclerview.iml" />
       <module fileurl="file://$PROJECT_DIR$/phoneAssistant.iml" filepath="$PROJECT_DIR$/phoneAssistant.iml" />
     </modules>
   </component>
