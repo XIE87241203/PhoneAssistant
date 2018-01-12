@@ -1,5 +1,6 @@
 package com.assistant.xie.model.news;
 
+import com.assistant.xie.Utils.CommonMethods;
 import com.assistant.xie.Utils.HttpRequestUtils;
 import com.assistant.xie.model.news.channel.netease.NewsInfo;
 
@@ -21,9 +22,9 @@ public class NewsInfoParse {
 
     public static List<NewsInfo> parseNeteaseNews(String responseStr) {
         List<NewsInfo> result = null;
-        if (responseStr != null) {
-            responseStr = responseStr.substring("artiList(".length(), responseStr.length() - 1);
+        if (responseStr != null && !CommonMethods.isEmptyString(responseStr)) {
             try {
+                responseStr = responseStr.substring("artiList(".length(), responseStr.length() - 1);
                 JSONObject root = new JSONObject(responseStr);
                 JSONArray datas = root.getJSONArray("BBM54PGAwangning");
                 result = new ArrayList<>();

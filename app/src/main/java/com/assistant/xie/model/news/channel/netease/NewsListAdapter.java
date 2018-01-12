@@ -66,17 +66,18 @@ public class NewsListAdapter extends AutoLoadRecyclerAdapter<BaseRecyclerViewHol
                 intent.putExtra("url", list.get(position).getUrl());
                 break;
             case 1:
-                LinearLayout ll_image = holder.getView(R.id.ll_image);
                 List<ImageView> imageViewList = new ArrayList<>();
-                imageViewList.add(addImageView(ll_image, false));
-                for (int i = 0; i < list.get(position).getImgextra().size(); i++) {
-                    boolean isEnd = i == (list.get(position).getImgextra().size() - 1);
-                    imageViewList.add(addImageView(ll_image, isEnd));
-                }
+                imageViewList.add((ImageView) holder.getView(R.id.img_1));
+                imageViewList.add((ImageView) holder.getView(R.id.img_2));
+                imageViewList.add((ImageView) holder.getView(R.id.img_3));
                 //加载图片
                 GlideUtils.loadImage(context, list.get(position).getImgsrc(), R.color.defaultImageHolderColor, imageViewList.get(0));
                 intent.putExtra("url", list.get(position).getSkipURL());
-                for (int i = 0; i < list.get(position).getImgextra().size(); i++) {
+                int imgNum = 3;
+                if (list.get(position).getImgextra().size() <= 3) {
+                    imgNum = list.get(position).getImgextra().size();
+                }
+                for (int i = 0; i < imgNum; i++) {
                     //加载图片
                     GlideUtils.loadImage(context, list.get(position).getImgextra().get(i), R.color.defaultImageHolderColor, imageViewList.get(i + 1));
                 }
@@ -113,17 +114,5 @@ public class NewsListAdapter extends AutoLoadRecyclerAdapter<BaseRecyclerViewHol
     @Override
     public int getRealItemCount() {
         return list.size();
-    }
-
-
-    private ImageView addImageView(LinearLayout linearLayout, boolean isEnd) {
-        ImageView imageView = new ImageView(context);
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        lp.weight = 1;
-        if (!isEnd)
-            lp.setMarginEnd((int) context.getResources().getDimension(R.dimen.news_netease_item2_img_margen_end));
-        linearLayout.addView(imageView, lp);
-        return imageView;
     }
 }

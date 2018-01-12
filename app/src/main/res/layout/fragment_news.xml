@@ -5,9 +5,8 @@
     android:background="@color/defaultBackgroundColor"
     tools:context="com.assistant.xie.model.news.channel.netease.NewsFragment">
 
-
-    <com.xie.functionalrecyclerlayout.view.AutoLoadRecyclerView
-        android:id="@+id/recyclerView"
+    <com.xie.functionalrecyclerlayout.view.FunctionRecyclerLayout
+        android:id="@+id/recyclerlayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:overScrollMode="never"/>

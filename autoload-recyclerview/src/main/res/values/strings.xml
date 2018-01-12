@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">AutoLoadRecyclerView</string>
     <string name="footer_hint_normal">― 没有更多了 ―</string>
+    <string name="function_top_btn_text">↑</string>
 </resources>

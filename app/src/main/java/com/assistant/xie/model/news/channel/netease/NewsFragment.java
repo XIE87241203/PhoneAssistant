@@ -3,29 +3,23 @@ package com.assistant.xie.model.news.channel.netease;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.NavUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.assistant.xie.R;
-import com.assistant.xie.Utils.DisplayUtil;
 import com.assistant.xie.Utils.HttpRequestUtils;
 import com.assistant.xie.Utils.NetErrorLayoutManager;
 import com.assistant.xie.model.base.BaseFragment;
 import com.assistant.xie.model.news.NewsInfoParse;
 import com.xie.functionalrecyclerlayout.adapter.AutoLoadRecyclerAdapter;
 import com.xie.functionalrecyclerlayout.view.AutoLoadRecyclerView;
+import com.xie.functionalrecyclerlayout.view.FunctionRecyclerLayout;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-
-import okhttp3.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,8 +31,11 @@ import okhttp3.Response;
  */
 public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapter.OnLoadMoreListener {
     public static final int CHANNEL_163 = 1;//网易新闻
+    private static final int REQUEST_NEWS_NUM = 10;//每次请求多少条
+    private static final int REQUEST_MAX_NEWS_NUM = 310;//最多请求多少条
     private static final String ARG_CHANNEL = "channel";
     private int channel;
+    private FunctionRecyclerLayout recyclerLayout;
     private AutoLoadRecyclerView recyclerView;
     private NewsListAdapter adapter;
     private List<NewsInfo> dataList;
@@ -87,21 +84,24 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
     private void requestData(final boolean isLoadMore) {
         String url = "http://3g.163.com/touch/reconstruct/article/list/BBM54PGAwangning/";
         int offset;
-        if(isLoadMore){
+        if (isLoadMore) {
             offset = dataList.size();
-        }else{
+        } else {
             offset = 0;
         }
-        url = url + offset + "-10.html";
+        url = url + offset + "-" + REQUEST_NEWS_NUM + ".html";
         HttpRequestUtils.getInstance().request(url, HttpRequestUtils.TYPE_REQUEST_GET, null, 0, new HttpRequestUtils.HttpRequestCallback() {
             @Override
             public void onResponse(final String responseStr, int httpWhat) {
+                adapter.finishLoadMore(true);
                 if (getActivity() != null) {
-                    adapter.finishLoadMore();
                     final List<NewsInfo> result = NewsInfoParse.parseNeteaseNews(responseStr);
                     if (result != null) {
                         if (isLoadMore) {
                             adapter.addDataAndRefreshData(dataList, result);
+                            if(dataList.size()>=REQUEST_MAX_NEWS_NUM){
+                                adapter.finishLoadMore(false);
+                            }
                         } else {
                             netErrorLayoutManager.setNetErrorLayoutVisibility(false);
                             adapter.resetDataAndRefreshData(recyclerView, dataList, result);
@@ -114,7 +114,7 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
 
             @Override
             public void onFailure(IOException e, int httpWhat) {
-                adapter.finishLoadMore();
+                adapter.finishLoadMore(true);
                 if (!isLoadMore) {
                     netErrorLayoutManager.setNetErrorLayoutVisibility(true);
                 }
@@ -128,12 +128,14 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
     }
 
     private void initView(View rootView) {
-        recyclerView = rootView.findViewById(R.id.recyclerView);
+        recyclerLayout = rootView.findViewById(R.id.recyclerlayout);
+        recyclerLayout.setTopBtnEnable(true);
+        recyclerView = recyclerLayout.getRecyclerView();
         recyclerView.setItemMargin(0.5f);
         dataList = new ArrayList<>();
         adapter = new NewsListAdapter(getContext(), dataList);
         recyclerView.setAdapter(adapter);
-        adapter.setAutoLoadEnable(true);
+        adapter.setAutoLoadMore(true);
         adapter.setOnLoadMoreListener(this);
         netErrorLayoutManager = new NetErrorLayoutManager(rootView, recyclerView, new View.OnClickListener() {
             @Override

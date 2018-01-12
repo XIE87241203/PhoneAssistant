@@ -1,0 +1,8 @@
+<resources>
+    <!--FunctionRecyclerView-->
+    <dimen name="function_top_btn_height">40dp</dimen>
+    <dimen name="function_top_btn_width">40dp</dimen>
+    <dimen name="function_top_btn_margen_end">25dp</dimen>
+    <dimen name="function_top_btn_margen_bottom">70dp</dimen>
+    <dimen name="function_top_btn_padding_bottom">3dp</dimen>
+</resources>

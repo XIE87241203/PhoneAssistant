@@ -22,9 +22,10 @@ import java.util.List;
 /**
  * Created by iSmartGo-XIE on 2017/7/6.
  * 支持设置头部和脚部功能，同时可以设置一个空布局和位于头部和item的一个副头部（一般用于添加边距）
- *
+ * <p>
  * addDataAndRefreshData和resetDataAndRefreshData方法可以用于快速添加数据
  * 结合AutoLoadRecyclerView使用
+ *
  * @see AutoLoadRecyclerView
  */
 
@@ -323,6 +324,7 @@ public abstract class AutoLoadRecyclerAdapter<T extends BaseRecyclerViewHolder> 
 
     /**
      * 加载更多回调
+     *
      * @param onLoadMoreListener
      */
     public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
@@ -334,22 +336,30 @@ public abstract class AutoLoadRecyclerAdapter<T extends BaseRecyclerViewHolder> 
         }
     }
 
-    /**
-     * 加载完成
-     */
-    public void finishLoadMore() {
-        if (loadMoreFooterView == null) return;
-        loadMoreFooterView.setState(AutoLoadFooter.STATE_NORMAL);
-        isPullLoading = false;
-    }
+//    /**
+//     * 加载完成
+//     */
+//    public void finishLoadMore() {
+//        if (loadMoreFooterView == null) return;
+//        loadMoreFooterView.setState(AutoLoadFooter.STATE_NORMAL);
+//        isPullLoading = false;
+//    }
 
     /**
-     * 停止加载,显示“没有更多了”
+     * 加载完成
+     *
+     * @param hasMoreData 往下是否还有数据 若为ture：加载提示消失保持自动加载功能， 若为false：加载提示消失，关闭自动加载功能
      */
-    public void stopLoadMore() {
+    public void finishLoadMore(boolean hasMoreData) {
         if (loadMoreFooterView == null) return;
-        loadMoreFooterView.setState(AutoLoadFooter.STATE_HINT);
+        if (hasMoreData) {
+            loadMoreFooterView.setState(AutoLoadFooter.STATE_NORMAL);
+        } else {
+            loadMoreFooterView.setState(AutoLoadFooter.STATE_HINT);
+        }
         isPullLoading = false;
+        isAutoLoadMore = hasMoreData;
+
     }
 
     public boolean isPullLoading() {
@@ -398,15 +408,6 @@ public abstract class AutoLoadRecyclerAdapter<T extends BaseRecyclerViewHolder> 
                 loadMoreFooterView.hide();
             }
         }
-    }
-
-    /**
-     * 暂停或者启动自动加载功能(仅仅暂停功能，加载提示还存在)
-     *
-     * @param autoLoadMore boolean 是否可自动刷新
-     */
-    public void setAutoLoadEnable(boolean autoLoadMore) {
-        isAutoLoadMore = autoLoadMore;
     }
 
     /**
