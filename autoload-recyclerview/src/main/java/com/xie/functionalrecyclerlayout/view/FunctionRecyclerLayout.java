@@ -2,6 +2,7 @@ package com.xie.functionalrecyclerlayout.view;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -17,7 +18,6 @@ import com.xie.functionalrecyclerlayout.R;
 /**
  * Created by XIE on 2018/1/12.
  * 多功能RecyclerView整合布局
- *
  */
 
 public class FunctionRecyclerLayout extends RelativeLayout {
@@ -25,6 +25,7 @@ public class FunctionRecyclerLayout extends RelativeLayout {
     private TextView tv_top_btn;//回到顶部按钮
     private boolean topBtnEnable;//回到顶部按钮是否可用
     private int firstPageItemNum = -1;//第一页有多少item
+    private SwipeRefreshLayout refreshLayout;//刷新布局
 
     public FunctionRecyclerLayout(Context context) {
         super(context);
@@ -42,6 +43,10 @@ public class FunctionRecyclerLayout extends RelativeLayout {
     }
 
     private void init(Context context) {
+        refreshLayout = new SwipeRefreshLayout(context);
+        refreshLayout.setColorSchemeColors(ContextCompat.getColor(context,R.color.colorPrimary));
+        LayoutParams refreshLP = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        addView(refreshLayout,refreshLP);
         recyclerView = new AutoLoadRecyclerView(context);
         recyclerView.setOverScrollMode(OVER_SCROLL_NEVER);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -75,7 +80,7 @@ public class FunctionRecyclerLayout extends RelativeLayout {
             }
         });
         LayoutParams recyclerLP = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        addView(recyclerView, recyclerLP);
+        refreshLayout.addView(recyclerView, recyclerLP);
         tv_top_btn = new TextView(context);
         tv_top_btn.setText(context.getString(R.string.function_top_btn_text));
         tv_top_btn.setTextColor(ContextCompat.getColor(context, R.color.function_top_btn_text_color));
@@ -121,5 +126,9 @@ public class FunctionRecyclerLayout extends RelativeLayout {
 
     public AutoLoadRecyclerView getRecyclerView() {
         return recyclerView;
+    }
+
+    public SwipeRefreshLayout getRefreshLayout() {
+        return refreshLayout;
     }
 }

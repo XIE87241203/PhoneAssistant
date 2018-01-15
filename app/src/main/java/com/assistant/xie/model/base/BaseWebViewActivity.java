@@ -1,10 +1,12 @@
 package com.assistant.xie.model.base;
 
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
-import android.view.WindowManager;
+import android.view.View;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.widget.ProgressBar;
 
 import com.assistant.xie.R;
 
@@ -12,17 +14,29 @@ import static android.view.KeyEvent.KEYCODE_BACK;
 
 public class BaseWebViewActivity extends BaseActivity {
     private BaseWebView webview;
+    private ProgressBar pb_webview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base_web_view);
-        ActionBar mActionBar=getSupportActionBar();
-        if(mActionBar!=null){
-            mActionBar.setTitle(getIntent().getStringExtra("title"));
-        }
         webview = findViewById(R.id.webview);
+        pb_webview = findViewById(R.id.pb_webview);
+        Log.i("BaseWebView", "load->" + getIntent().getStringExtra("url"));
         webview.loadUrl(getIntent().getStringExtra("url"));
+        webview.setWebChromeClient(new WebChromeClient(){
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                if(newProgress==100){
+                    pb_webview.setVisibility(View.GONE);
+                }else{
+                    if (pb_webview.getVisibility() == View.GONE)
+                        pb_webview.setVisibility(View.VISIBLE);
+                    pb_webview.setProgress(newProgress);
+                }
+                super.onProgressChanged(view, newProgress);
+            }
+        });
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {

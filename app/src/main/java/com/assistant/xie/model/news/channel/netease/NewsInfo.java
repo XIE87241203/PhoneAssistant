@@ -13,8 +13,8 @@ public class NewsInfo {
     private String commentCount;//评论数
     private String ptime;//发布时间
     private int imgsrc3gtype;//新闻类型 1：普通新闻 2：多图新闻 3：大图
-    private String url;//类型1用的跳转链接
-    private String skipURL;//类型2,3用的跳转链接
+    private String url;//次要跳转链接
+    private String skipURL;//优先跳转链接
     private List<String> imgextra;//类型2的排在imgsrc后的图片列表
     private String skipType;//文章类型 imgsrc3gtype=3时使用 其中：photoset图集，video视频
 

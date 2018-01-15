@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.assistant.xie.R;
+import com.assistant.xie.Utils.CommonMethods;
 import com.assistant.xie.Utils.GlideUtils;
 import com.assistant.xie.model.base.BaseWebViewActivity;
 import com.xie.functionalrecyclerlayout.adapter.AutoLoadRecyclerAdapter;
@@ -54,6 +55,11 @@ public class NewsListAdapter extends AutoLoadRecyclerAdapter<BaseRecyclerViewHol
     @Override
     protected void onBindViewHolderNew(BaseRecyclerViewHolder holder, final int position) {
         final Intent intent = new Intent(context, BaseWebViewActivity.class);
+        if(CommonMethods.isEmptyString(list.get(position).getSkipURL())){
+            intent.putExtra("url", list.get(position).getUrl());
+        }else{
+            intent.putExtra("url", list.get(position).getSkipURL());
+        }
         TextView tv_title = holder.getView(R.id.tv_title);
         TextView tv_time = holder.getView(R.id.tv_time);
         TextView tv_comment_count = holder.getView(R.id.tv_comment_count);
@@ -62,8 +68,6 @@ public class NewsListAdapter extends AutoLoadRecyclerAdapter<BaseRecyclerViewHol
                 ImageView iv_img = holder.getView(R.id.iv_img);
                 //加载图片
                 GlideUtils.loadImage(context, list.get(position).getImgsrc(), R.color.defaultImageHolderColor, iv_img);
-                //跳转链接
-                intent.putExtra("url", list.get(position).getUrl());
                 break;
             case 1:
                 List<ImageView> imageViewList = new ArrayList<>();
@@ -72,7 +76,6 @@ public class NewsListAdapter extends AutoLoadRecyclerAdapter<BaseRecyclerViewHol
                 imageViewList.add((ImageView) holder.getView(R.id.img_3));
                 //加载图片
                 GlideUtils.loadImage(context, list.get(position).getImgsrc(), R.color.defaultImageHolderColor, imageViewList.get(0));
-                intent.putExtra("url", list.get(position).getSkipURL());
                 int imgNum = 3;
                 if (list.get(position).getImgextra().size() <= 3) {
                     imgNum = list.get(position).getImgextra().size();
@@ -85,7 +88,6 @@ public class NewsListAdapter extends AutoLoadRecyclerAdapter<BaseRecyclerViewHol
             case 2:
                 ImageView iv_image = holder.getView(R.id.iv_image);
                 GlideUtils.loadImage(context, list.get(position).getImgsrc(), R.color.defaultImageHolderColor, iv_image);
-                intent.putExtra("url", list.get(position).getSkipURL());
                 break;
         }
 

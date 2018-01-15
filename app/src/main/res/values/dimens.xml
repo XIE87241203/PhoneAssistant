@@ -6,6 +6,8 @@
     <dimen name="default_line">0.5dp</dimen>
     <dimen name="default_type_line">10dp</dimen>
 
+    <dimen name="base_webview_progressbar_height">3dp</dimen>
+
     <!--手机状态界面-->
     <dimen name="phone_state_float_window_item">40dp</dimen>
     <dimen name="phone_state_title">25dp</dimen>

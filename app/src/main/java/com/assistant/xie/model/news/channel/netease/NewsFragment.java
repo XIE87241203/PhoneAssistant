@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,7 @@ import java.util.List;
  * Use the {@link NewsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapter.OnLoadMoreListener {
+public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapter.OnLoadMoreListener, SwipeRefreshLayout.OnRefreshListener {
     public static final int CHANNEL_163 = 1;//网易新闻
     private static final int REQUEST_NEWS_NUM = 10;//每次请求多少条
     private static final int REQUEST_MAX_NEWS_NUM = 310;//最多请求多少条
@@ -37,6 +38,7 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
     private int channel;
     private FunctionRecyclerLayout recyclerLayout;
     private AutoLoadRecyclerView recyclerView;
+    private SwipeRefreshLayout refreshLayout;
     private NewsListAdapter adapter;
     private List<NewsInfo> dataList;
     private NetErrorLayoutManager netErrorLayoutManager;
@@ -78,6 +80,7 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
     }
 
     private void initData() {
+        refreshLayout.setRefreshing(true);
         requestData(false);
     }
 
@@ -93,13 +96,17 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
         HttpRequestUtils.getInstance().request(url, HttpRequestUtils.TYPE_REQUEST_GET, null, 0, new HttpRequestUtils.HttpRequestCallback() {
             @Override
             public void onResponse(final String responseStr, int httpWhat) {
-                adapter.finishLoadMore(true);
+                if(isLoadMore){
+                    adapter.finishLoadMore(true);
+                }else{
+                    refreshLayout.setRefreshing(false);
+                }
                 if (getActivity() != null) {
                     final List<NewsInfo> result = NewsInfoParse.parseNeteaseNews(responseStr);
                     if (result != null) {
                         if (isLoadMore) {
                             adapter.addDataAndRefreshData(dataList, result);
-                            if(dataList.size()>=REQUEST_MAX_NEWS_NUM){
+                            if (dataList.size() >= REQUEST_MAX_NEWS_NUM) {
                                 adapter.finishLoadMore(false);
                             }
                         } else {
@@ -114,7 +121,11 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
 
             @Override
             public void onFailure(IOException e, int httpWhat) {
-                adapter.finishLoadMore(true);
+                if(isLoadMore){
+                    adapter.finishLoadMore(true);
+                }else{
+                    refreshLayout.setRefreshing(false);
+                }
                 if (!isLoadMore) {
                     netErrorLayoutManager.setNetErrorLayoutVisibility(true);
                 }
@@ -127,10 +138,18 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
         requestData(true);
     }
 
+
+    @Override
+    public void onRefresh() {
+        requestData(false);
+    }
+
     private void initView(View rootView) {
         recyclerLayout = rootView.findViewById(R.id.recyclerlayout);
         recyclerLayout.setTopBtnEnable(true);
         recyclerView = recyclerLayout.getRecyclerView();
+        refreshLayout = recyclerLayout.getRefreshLayout();
+        refreshLayout.setOnRefreshListener(this);
         recyclerView.setItemMargin(0.5f);
         dataList = new ArrayList<>();
         adapter = new NewsListAdapter(getContext(), dataList);
