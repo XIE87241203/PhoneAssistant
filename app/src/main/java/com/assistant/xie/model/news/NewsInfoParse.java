@@ -20,13 +20,20 @@ import okhttp3.Response;
 
 public class NewsInfoParse {
 
-    public static List<NewsInfo> parseNeteaseNews(String responseStr) {
+    /**
+     * 解析网易行文
+     * @param responseStr responseStr
+     * @param channelCode 频道号
+     * @see com.assistant.xie.model.news.channel.netease.ChannelCode
+     * @return
+     */
+    public static List<NewsInfo> parseNeteaseNews(String responseStr,String channelCode) {
         List<NewsInfo> result = null;
         if (responseStr != null && !CommonMethods.isEmptyString(responseStr)) {
             try {
                 responseStr = responseStr.substring("artiList(".length(), responseStr.length() - 1);
                 JSONObject root = new JSONObject(responseStr);
-                JSONArray datas = root.getJSONArray("BBM54PGAwangning");
+                JSONArray datas = root.getJSONArray(channelCode);
                 result = new ArrayList<>();
                 for (int i = 0; i < datas.length(); i++) {
                     JSONObject data = (JSONObject) datas.get(i);

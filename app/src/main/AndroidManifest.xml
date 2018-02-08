@@ -24,8 +24,7 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".model.main.MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:label="@string/app_name">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
 

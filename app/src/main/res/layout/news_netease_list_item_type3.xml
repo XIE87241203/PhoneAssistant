@@ -2,10 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/defaultItemColor"
     android:gravity="top"
     android:orientation="vertical"
     android:paddingEnd="@dimen/news_netease_item3_horizontal_padding"
-    android:background="@color/defaultItemColor"
     android:paddingStart="@dimen/news_netease_item3_horizontal_padding">
 
     <TextView
@@ -20,11 +20,27 @@
         android:textColor="@color/news_netease_item_title_text_color"
         android:textSize="@dimen/news_netease_item3_title_text_size" />
 
-    <ImageView
-        android:id="@+id/iv_image"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/news_netease_item3_img_height"
-        android:scaleType="centerCrop"/>
+        android:layout_height="@dimen/news_netease_item3_img_height">
+    
+        <ImageView
+            android:id="@+id/iv_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/news_netease_item3_tips_text_size"
+            android:text="图集"
+            android:gravity="center"
+            android:padding="@dimen/news_netease_item3_tips_text_padding"
+            android:textColor="@color/news_netease_item_tips_text_color"
+            android:background="@color/news_netease_item_tips_color"/>
+    </RelativeLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"

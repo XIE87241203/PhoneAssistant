@@ -86,7 +86,7 @@ public class FunctionRecyclerLayout extends RelativeLayout {
         tv_top_btn.setTextColor(ContextCompat.getColor(context, R.color.function_top_btn_text_color));
         tv_top_btn.setBackgroundResource(R.drawable.bg_radius_7f000000_20dp);
         tv_top_btn.setGravity(Gravity.CENTER);
-        tv_top_btn.setTextSize(20);
+        tv_top_btn.setTextSize(25);
         tv_top_btn.setPadding(0, 0, 0, (int) context.getResources().getDimension(R.dimen.function_top_btn_padding_bottom));
         LayoutParams topBtnLP = new LayoutParams((int) context.getResources().getDimension(R.dimen.function_top_btn_height), (int) context.getResources().getDimension(R.dimen.function_top_btn_width));
         topBtnLP.setMargins(0, 0, (int) context.getResources().getDimension(R.dimen.function_top_btn_margen_end), (int) context.getResources().getDimension(R.dimen.function_top_btn_margen_bottom));

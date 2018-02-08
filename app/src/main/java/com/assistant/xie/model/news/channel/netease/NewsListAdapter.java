@@ -55,9 +55,9 @@ public class NewsListAdapter extends AutoLoadRecyclerAdapter<BaseRecyclerViewHol
     @Override
     protected void onBindViewHolderNew(BaseRecyclerViewHolder holder, final int position) {
         final Intent intent = new Intent(context, BaseWebViewActivity.class);
-        if(CommonMethods.isEmptyString(list.get(position).getSkipURL())){
+        if (CommonMethods.isEmptyString(list.get(position).getSkipURL()) || getItemViewTypeNew(position) == 0) {
             intent.putExtra("url", list.get(position).getUrl());
-        }else{
+        } else {
             intent.putExtra("url", list.get(position).getSkipURL());
         }
         TextView tv_title = holder.getView(R.id.tv_title);
@@ -66,8 +66,13 @@ public class NewsListAdapter extends AutoLoadRecyclerAdapter<BaseRecyclerViewHol
         switch (getItemViewTypeNew(position)) {
             case 0:
                 ImageView iv_img = holder.getView(R.id.iv_img);
-                //加载图片
-                GlideUtils.loadImage(context, list.get(position).getImgsrc(), R.color.defaultImageHolderColor, iv_img);
+                if(CommonMethods.isEmptyString(list.get(position).getImgsrc())){
+                    iv_img.setVisibility(View.GONE);
+                }else{
+                    //加载图片
+                    iv_img.setVisibility(View.VISIBLE);
+                    GlideUtils.loadImage(context, list.get(position).getImgsrc(), R.color.defaultImageHolderColor, iv_img);
+                }
                 break;
             case 1:
                 List<ImageView> imageViewList = new ArrayList<>();

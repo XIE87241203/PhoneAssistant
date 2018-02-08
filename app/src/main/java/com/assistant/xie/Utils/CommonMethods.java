@@ -60,7 +60,7 @@ public class CommonMethods {
             serviceInfos = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC);
             for (AccessibilityServiceInfo info : serviceInfos) {
                 String id = info.getId();
-                Log.v("testMsg", "all -->" + id + "  name-->" + name);
+//                Log.v("testMsg", "all -->" + id + "  name-->" + name);
                 if (id.contains(name)) {
                     return true;
                 }

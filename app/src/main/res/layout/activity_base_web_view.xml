@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.assistant.xie.model.base.BaseWebViewActivity">
+    tools:context="com.assistant.xie.model.main.MainActivity">
 
-    <ProgressBar
-        android:id="@+id/pb_webview"
-        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Horizontal"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/base_webview_progressbar_height"
-        android:progressDrawable="@drawable/bg_webview_progressbar"
-        android:max="100"
-        android:progress="50" />
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
 
-    <com.assistant.xie.model.base.BaseWebView
-        android:id="@+id/webview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-</LinearLayout>
+    </android.support.design.widget.AppBarLayout>
+
+    <include layout="@layout/content_base_web_view" />
+
+</android.support.design.widget.CoordinatorLayout>
+

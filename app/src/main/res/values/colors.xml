@@ -12,4 +12,6 @@
     <!--网易新闻模块-->
     <color name="news_netease_item_title_text_color">#404040</color>
     <color name="news_netease_item_dec_text_color">#888888</color>
+    <color name="news_netease_item_tips_color">#cc5da3e9</color>
+    <color name="news_netease_item_tips_text_color">#ffffff</color>
 </resources>

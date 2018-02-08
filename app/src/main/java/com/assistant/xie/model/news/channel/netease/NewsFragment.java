@@ -31,11 +31,10 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapter.OnLoadMoreListener, SwipeRefreshLayout.OnRefreshListener {
-    public static final int CHANNEL_163 = 1;//网易新闻
     private static final int REQUEST_NEWS_NUM = 10;//每次请求多少条
     private static final int REQUEST_MAX_NEWS_NUM = 310;//最多请求多少条
     private static final String ARG_CHANNEL = "channel";
-    private int channel;
+    private String channel;
     private FunctionRecyclerLayout recyclerLayout;
     private AutoLoadRecyclerView recyclerView;
     private SwipeRefreshLayout refreshLayout;
@@ -52,12 +51,12 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
     /**
      * @param channel 新闻来源
      * @return A new instance of fragment NewsFragment.
-     * @see #CHANNEL_163
+     * @see ChannelCode
      */
-    public static NewsFragment newInstance(int channel) {
+    public static NewsFragment newInstance(String channel) {
         NewsFragment fragment = new NewsFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_CHANNEL, channel);
+        args.putString(ARG_CHANNEL, channel);
         fragment.setArguments(args);
         return fragment;
     }
@@ -66,7 +65,7 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            channel = getArguments().getInt(ARG_CHANNEL);
+            channel = getArguments().getString(ARG_CHANNEL);
         }
     }
 
@@ -85,7 +84,7 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
     }
 
     private void requestData(final boolean isLoadMore) {
-        String url = "http://3g.163.com/touch/reconstruct/article/list/BBM54PGAwangning/";
+        String url = "http://3g.163.com/touch/reconstruct/article/list/" + channel + "/";
         int offset;
         if (isLoadMore) {
             offset = dataList.size();
@@ -96,13 +95,13 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
         HttpRequestUtils.getInstance().request(url, HttpRequestUtils.TYPE_REQUEST_GET, null, 0, new HttpRequestUtils.HttpRequestCallback() {
             @Override
             public void onResponse(final String responseStr, int httpWhat) {
-                if(isLoadMore){
+                if (isLoadMore) {
                     adapter.finishLoadMore(true);
-                }else{
+                } else {
                     refreshLayout.setRefreshing(false);
                 }
                 if (getActivity() != null) {
-                    final List<NewsInfo> result = NewsInfoParse.parseNeteaseNews(responseStr);
+                    final List<NewsInfo> result = NewsInfoParse.parseNeteaseNews(responseStr,channel);
                     if (result != null) {
                         if (isLoadMore) {
                             adapter.addDataAndRefreshData(dataList, result);
@@ -121,9 +120,9 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
 
             @Override
             public void onFailure(IOException e, int httpWhat) {
-                if(isLoadMore){
+                if (isLoadMore) {
                     adapter.finishLoadMore(true);
-                }else{
+                } else {
                     refreshLayout.setRefreshing(false);
                 }
                 if (!isLoadMore) {
