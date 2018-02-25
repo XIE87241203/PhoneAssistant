@@ -51,7 +51,8 @@
 
         <activity android:name=".model.red_envelope_remind.RedEnvelopeRemindActivity" />
         <activity android:name=".model.news.NewsActivity" />
-        <activity android:name=".model.base.BaseWebViewActivity"/>
+        <activity android:name=".model.base.BaseWebViewActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

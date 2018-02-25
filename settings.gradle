@@ -1,1 +1,1 @@
-include ':app', ':autoload-recyclerview', ':funnygame'
+include ':app', ':autoload-recyclerview'
