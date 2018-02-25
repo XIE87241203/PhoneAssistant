@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -22,7 +23,7 @@ import com.xie.functionalrecyclerlayout.R;
 
 public class FunctionRecyclerLayout extends RelativeLayout {
     private AutoLoadRecyclerView recyclerView;
-    private TextView tv_top_btn;//回到顶部按钮
+    private ImageView tv_top_btn;//回到顶部按钮
     private boolean topBtnEnable;//回到顶部按钮是否可用
     private int firstPageItemNum = -1;//第一页有多少item
     private SwipeRefreshLayout refreshLayout;//刷新布局
@@ -81,13 +82,8 @@ public class FunctionRecyclerLayout extends RelativeLayout {
         });
         LayoutParams recyclerLP = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         refreshLayout.addView(recyclerView, recyclerLP);
-        tv_top_btn = new TextView(context);
-        tv_top_btn.setText(context.getString(R.string.function_top_btn_text));
-        tv_top_btn.setTextColor(ContextCompat.getColor(context, R.color.function_top_btn_text_color));
-        tv_top_btn.setBackgroundResource(R.drawable.bg_radius_7f000000_20dp);
-        tv_top_btn.setGravity(Gravity.CENTER);
-        tv_top_btn.setTextSize(25);
-        tv_top_btn.setPadding(0, 0, 0, (int) context.getResources().getDimension(R.dimen.function_top_btn_padding_bottom));
+        tv_top_btn = new ImageView(context);
+        tv_top_btn.setImageResource(R.drawable.ic_btn_top);
         LayoutParams topBtnLP = new LayoutParams((int) context.getResources().getDimension(R.dimen.function_top_btn_height), (int) context.getResources().getDimension(R.dimen.function_top_btn_width));
         topBtnLP.setMargins(0, 0, (int) context.getResources().getDimension(R.dimen.function_top_btn_margen_end), (int) context.getResources().getDimension(R.dimen.function_top_btn_margen_bottom));
         topBtnLP.addRule(ALIGN_PARENT_BOTTOM);
