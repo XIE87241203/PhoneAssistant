@@ -4,6 +4,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.assistant.xie.model.news.channel.netease.Channel;
+import com.assistant.xie.model.news.channel.netease.NewsFragment;
+
 import java.util.List;
 
 /**
@@ -12,13 +15,13 @@ import java.util.List;
  */
 
 public class NewsFragmentPagerAdapter extends FragmentPagerAdapter {
-    private List<Fragment> fragmentList;
-    private List<String> titleList;
+    private List<NewsFragment> fragmentList;
+    private List<Channel> channelList;
 
-    NewsFragmentPagerAdapter(FragmentManager fm, List<String> titleList, List<Fragment> fragmentList) {
+    NewsFragmentPagerAdapter(FragmentManager fm,List<Channel> channelList, List<NewsFragment> fragmentList) {
         super(fm);
-        this.titleList = titleList;
         this.fragmentList = fragmentList;
+        this.channelList = channelList;
     }
 
     @Override
@@ -33,6 +36,6 @@ public class NewsFragmentPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return titleList.get(position);
+        return channelList.get(position).getName();
     }
 }

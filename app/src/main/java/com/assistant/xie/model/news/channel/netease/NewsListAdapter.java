@@ -4,16 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.assistant.xie.R;
 import com.assistant.xie.Utils.CommonMethods;
 import com.assistant.xie.Utils.GlideUtils;
 import com.assistant.xie.model.base.BaseWebViewActivity;
+import com.assistant.xie.model.news.channel.netease.bean.ImgListNewsInfo;
+import com.assistant.xie.model.news.channel.netease.bean.LargerImgNewsInfo;
+import com.assistant.xie.model.news.channel.netease.bean.NewsInfo;
 import com.xie.functionalrecyclerlayout.adapter.AutoLoadRecyclerAdapter;
 import com.xie.functionalrecyclerlayout.holder.BaseRecyclerViewHolder;
 
@@ -39,14 +39,14 @@ public class NewsListAdapter extends AutoLoadRecyclerAdapter<BaseRecyclerViewHol
     protected BaseRecyclerViewHolder onCreateViewHolderNew(ViewGroup parent, int viewType) {
         BaseRecyclerViewHolder viewHolder = null;
         switch (viewType) {
-            case 0:
-                viewHolder = BaseRecyclerViewHolder.createViewHolder(context, parent, R.layout.news_netease_list_item_type1);
-                break;
-            case 1:
+            case NewsInfo.TYPE_IMG_LIST_NEWS_INFO:
                 viewHolder = BaseRecyclerViewHolder.createViewHolder(context, parent, R.layout.news_netease_list_item_type2);
                 break;
-            case 2:
+            case NewsInfo.TYPE_LAGER_IMG_NEWS_INFO:
                 viewHolder = BaseRecyclerViewHolder.createViewHolder(context, parent, R.layout.news_netease_list_item_type3);
+                break;
+            default:
+                viewHolder = BaseRecyclerViewHolder.createViewHolder(context, parent, R.layout.news_netease_list_item_type1);
                 break;
         }
         return viewHolder;
@@ -55,55 +55,71 @@ public class NewsListAdapter extends AutoLoadRecyclerAdapter<BaseRecyclerViewHol
     @Override
     protected void onBindViewHolderNew(BaseRecyclerViewHolder holder, final int position) {
         final Intent intent = new Intent(context, BaseWebViewActivity.class);
-        if (CommonMethods.isEmptyString(list.get(position).getSkipURL()) || getItemViewTypeNew(position) == 0) {
-            intent.putExtra("url", list.get(position).getUrl());
+        final NewsInfo newsInfo = list.get(position);
+        if (CommonMethods.isEmptyString(newsInfo.getSkipURL()) || getItemViewTypeNew(position) == 0) {
+            intent.putExtra("url", newsInfo.getUrl());
         } else {
-            intent.putExtra("url", list.get(position).getSkipURL());
+            intent.putExtra("url", newsInfo.getSkipURL());
         }
         TextView tv_title = holder.getView(R.id.tv_title);
         TextView tv_time = holder.getView(R.id.tv_time);
         TextView tv_comment_count = holder.getView(R.id.tv_comment_count);
-        switch (getItemViewTypeNew(position)) {
-            case 0:
-                ImageView iv_img = holder.getView(R.id.iv_img);
-                if(CommonMethods.isEmptyString(list.get(position).getImgsrc())){
-                    iv_img.setVisibility(View.GONE);
-                }else{
-                    //加载图片
-                    iv_img.setVisibility(View.VISIBLE);
-                    GlideUtils.loadImage(context, list.get(position).getImgsrc(), R.color.defaultImageHolderColor, iv_img);
-                }
-                break;
-            case 1:
+        switch (newsInfo.getImgsrc3gtype()) {
+            case NewsInfo.TYPE_IMG_LIST_NEWS_INFO:
+                ImgListNewsInfo imgListNewsInfo = (ImgListNewsInfo) newsInfo;
                 List<ImageView> imageViewList = new ArrayList<>();
                 imageViewList.add((ImageView) holder.getView(R.id.img_1));
                 imageViewList.add((ImageView) holder.getView(R.id.img_2));
                 imageViewList.add((ImageView) holder.getView(R.id.img_3));
                 //加载图片
-                GlideUtils.loadImage(context, list.get(position).getImgsrc(), R.color.defaultImageHolderColor, imageViewList.get(0));
+                GlideUtils.loadImage(context, newsInfo.getImgsrc(), R.color.defaultImageHolderColor, imageViewList.get(0));
                 int imgNum = 3;
-                if (list.get(position).getImgextra().size() <= 3) {
-                    imgNum = list.get(position).getImgextra().size();
+                if (imgListNewsInfo.getImgextra().size() <= 3) {
+                    imgNum = imgListNewsInfo.getImgextra().size();
                 }
                 for (int i = 0; i < imgNum; i++) {
                     //加载图片
-                    GlideUtils.loadImage(context, list.get(position).getImgextra().get(i), R.color.defaultImageHolderColor, imageViewList.get(i + 1));
+                    GlideUtils.loadImage(context, imgListNewsInfo.getImgextra().get(i), R.color.defaultImageHolderColor, imageViewList.get(i + 1));
                 }
                 break;
-            case 2:
-                ImageView iv_image = holder.getView(R.id.iv_image);
-                GlideUtils.loadImage(context, list.get(position).getImgsrc(), R.color.defaultImageHolderColor, iv_image);
+            case NewsInfo.TYPE_LAGER_IMG_NEWS_INFO:
+                LargerImgNewsInfo largerImgNewsInfo = (LargerImgNewsInfo) newsInfo;
+                ImageView iv_image = holder.getView(R.id.iv_img);
+                TextView tv_type = holder.getView(R.id.tv_type);
+                GlideUtils.loadImage(context, largerImgNewsInfo.getImgsrc(), R.color.defaultImageHolderColor, iv_image);
+                switch (largerImgNewsInfo.getSkipType()){
+                    case "photoset":
+                        tv_type.setVisibility(View.VISIBLE);
+                        tv_type.setText("图集");
+                        break;
+                    case "video":
+                        tv_type.setVisibility(View.VISIBLE);
+                        tv_type.setText("视频");
+                        break;
+                    default:
+                        tv_type.setVisibility(View.GONE);
+                        break;
+                }
+                break;
+            default:
+                ImageView iv_img = holder.getView(R.id.iv_img);
+                if (CommonMethods.isEmptyString(newsInfo.getImgsrc())) {
+                    iv_img.setVisibility(View.GONE);
+                } else {
+                    //加载图片
+                    iv_img.setVisibility(View.VISIBLE);
+                    GlideUtils.loadImage(context, newsInfo.getImgsrc(), R.color.defaultImageHolderColor, iv_img);
+                }
                 break;
         }
-
         //共同属性设置
-        tv_title.setText(list.get(position).getTitle());
-        tv_time.setText(list.get(position).getPtime());
-        tv_comment_count.setText(String.format(context.getString(R.string.news_netease_comment_count), list.get(position).getCommentCount()));
+        tv_title.setText(newsInfo.getTitle());
+        tv_time.setText(newsInfo.getPtime());
+        tv_comment_count.setText(String.format(context.getString(R.string.news_netease_comment_count), newsInfo.getCommentCount()));
         holder.getConvertView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                intent.putExtra("title", list.get(position).getTitle());
+                intent.putExtra("title", newsInfo.getTitle());
                 context.startActivity(intent);
             }
         });
@@ -111,11 +127,7 @@ public class NewsListAdapter extends AutoLoadRecyclerAdapter<BaseRecyclerViewHol
 
     @Override
     protected int getItemViewTypeNew(int position) {
-        if ((list.get(position).getImgsrc3gtype() - 1) > 2 || (list.get(position).getImgsrc3gtype() - 1) < 0) {
-            return 0;
-        } else {
-            return list.get(position).getImgsrc3gtype() - 1;
-        }
+        return list.get(position).getImgsrc3gtype();
     }
 
     @Override

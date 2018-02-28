@@ -1,7 +1,5 @@
 package com.assistant.xie.model.news.channel.netease;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,6 +12,7 @@ import com.assistant.xie.Utils.HttpRequestUtils;
 import com.assistant.xie.Utils.NetErrorLayoutManager;
 import com.assistant.xie.model.base.BaseFragment;
 import com.assistant.xie.model.news.NewsInfoParse;
+import com.assistant.xie.model.news.channel.netease.bean.NewsInfo;
 import com.xie.functionalrecyclerlayout.adapter.AutoLoadRecyclerAdapter;
 import com.xie.functionalrecyclerlayout.view.AutoLoadRecyclerView;
 import com.xie.functionalrecyclerlayout.view.FunctionRecyclerLayout;
@@ -22,27 +21,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link NewsFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link NewsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapter.OnLoadMoreListener, SwipeRefreshLayout.OnRefreshListener {
     private static final int REQUEST_NEWS_NUM = 10;//每次请求多少条
     private static final int REQUEST_MAX_NEWS_NUM = 310;//最多请求多少条
-    private static final String ARG_CHANNEL = "channel";
-    private String channel;
+    public static final String ARG_CHANNEL = "channel";
+    private Channel channel;
     private FunctionRecyclerLayout recyclerLayout;
     private AutoLoadRecyclerView recyclerView;
     private SwipeRefreshLayout refreshLayout;
     private NewsListAdapter adapter;
     private List<NewsInfo> dataList;
     private NetErrorLayoutManager netErrorLayoutManager;
-
-    private OnFragmentInteractionListener mListener;
 
     public NewsFragment() {
         // Required empty public constructor
@@ -51,12 +40,12 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
     /**
      * @param channel 新闻来源
      * @return A new instance of fragment NewsFragment.
-     * @see ChannelCode
+     * @see Channel
      */
-    public static NewsFragment newInstance(String channel) {
+    public static NewsFragment newInstance(Channel channel) {
         NewsFragment fragment = new NewsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_CHANNEL, channel);
+        args.putSerializable(ARG_CHANNEL, channel);
         fragment.setArguments(args);
         return fragment;
     }
@@ -65,7 +54,7 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            channel = getArguments().getString(ARG_CHANNEL);
+            channel = (Channel) getArguments().getSerializable(ARG_CHANNEL);
         }
     }
 
@@ -84,7 +73,7 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
     }
 
     private void requestData(final boolean isLoadMore) {
-        String url = "http://3g.163.com/touch/reconstruct/article/list/" + channel + "/";
+        String url = "http://3g.163.com/touch/reconstruct/article/list/" + channel.getCode() + "/";
         int offset;
         if (isLoadMore) {
             offset = dataList.size();
@@ -101,7 +90,7 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
                     refreshLayout.setRefreshing(false);
                 }
                 if (getActivity() != null) {
-                    final List<NewsInfo> result = NewsInfoParse.parseNeteaseNews(responseStr,channel);
+                    final List<NewsInfo> result = NewsInfoParse.parseNeteaseNews(responseStr, channel.getCode());
                     if (result != null) {
                         if (isLoadMore) {
                             adapter.addDataAndRefreshData(dataList, result);
@@ -161,29 +150,5 @@ public class NewsFragment extends BaseFragment implements AutoLoadRecyclerAdapte
                 requestData(false);
             }
         });
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * Fragment与Activity传递信息
-     */
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 }
