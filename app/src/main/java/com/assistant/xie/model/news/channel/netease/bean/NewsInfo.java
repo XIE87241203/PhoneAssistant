@@ -15,7 +15,7 @@ public class NewsInfo {
 
     private String title;//标题
     private String imgsrc;//图片地址
-    private String commentCount;//评论数
+    private int commentCount;//评论数
     private String ptime;//发布时间
     private String skipURL;//优先跳转链接
     private String url;//次要跳转链接
@@ -37,11 +37,11 @@ public class NewsInfo {
         this.imgsrc = imgsrc;
     }
 
-    public String getCommentCount() {
+    public int getCommentCount() {
         return commentCount;
     }
 
-    public void setCommentCount(String commentCount) {
+    public void setCommentCount(int commentCount) {
         this.commentCount = commentCount;
     }
 

@@ -11,6 +11,7 @@ import com.assistant.xie.R;
 import com.assistant.xie.Utils.CommonMethods;
 import com.assistant.xie.Utils.GlideUtils;
 import com.assistant.xie.model.base.BaseWebViewActivity;
+import com.assistant.xie.model.news.NewsUtils;
 import com.assistant.xie.model.news.channel.netease.bean.ImgListNewsInfo;
 import com.assistant.xie.model.news.channel.netease.bean.LargerImgNewsInfo;
 import com.assistant.xie.model.news.channel.netease.bean.NewsInfo;
@@ -72,22 +73,22 @@ public class NewsListAdapter extends AutoLoadRecyclerAdapter<BaseRecyclerViewHol
                 imageViewList.add((ImageView) holder.getView(R.id.img_2));
                 imageViewList.add((ImageView) holder.getView(R.id.img_3));
                 //加载图片
-                GlideUtils.loadImage(context, newsInfo.getImgsrc(), R.color.defaultImageHolderColor, imageViewList.get(0));
+                GlideUtils.loadImage(context, NewsUtils.getInstance(context).getImgRequestUrl(newsInfo.getImgsrc(), newsInfo.getImgsrc3gtype()), R.color.defaultImageHolderColor, imageViewList.get(0));
                 int imgNum = 3;
                 if (imgListNewsInfo.getImgextra().size() <= 3) {
                     imgNum = imgListNewsInfo.getImgextra().size();
                 }
                 for (int i = 0; i < imgNum; i++) {
                     //加载图片
-                    GlideUtils.loadImage(context, imgListNewsInfo.getImgextra().get(i), R.color.defaultImageHolderColor, imageViewList.get(i + 1));
+                    GlideUtils.loadImage(context, NewsUtils.getInstance(context).getImgRequestUrl(imgListNewsInfo.getImgextra().get(i), newsInfo.getImgsrc3gtype()), R.color.defaultImageHolderColor, imageViewList.get(i + 1));
                 }
                 break;
             case NewsInfo.TYPE_LAGER_IMG_NEWS_INFO:
                 LargerImgNewsInfo largerImgNewsInfo = (LargerImgNewsInfo) newsInfo;
                 ImageView iv_image = holder.getView(R.id.iv_img);
                 TextView tv_type = holder.getView(R.id.tv_type);
-                GlideUtils.loadImage(context, largerImgNewsInfo.getImgsrc(), R.color.defaultImageHolderColor, iv_image);
-                switch (largerImgNewsInfo.getSkipType()){
+                GlideUtils.loadImage(context, NewsUtils.getInstance(context).getImgRequestUrl(largerImgNewsInfo.getImgsrc(), newsInfo.getImgsrc3gtype()), R.color.defaultImageHolderColor, iv_image);
+                switch (largerImgNewsInfo.getSkipType()) {
                     case "photoset":
                         tv_type.setVisibility(View.VISIBLE);
                         tv_type.setText("图集");
@@ -108,14 +109,14 @@ public class NewsListAdapter extends AutoLoadRecyclerAdapter<BaseRecyclerViewHol
                 } else {
                     //加载图片
                     iv_img.setVisibility(View.VISIBLE);
-                    GlideUtils.loadImage(context, newsInfo.getImgsrc(), R.color.defaultImageHolderColor, iv_img);
+                    GlideUtils.loadImage(context, NewsUtils.getInstance(context).getImgRequestUrl(newsInfo.getImgsrc(), newsInfo.getImgsrc3gtype()), R.color.defaultImageHolderColor, iv_img);
                 }
                 break;
         }
         //共同属性设置
         tv_title.setText(newsInfo.getTitle());
-        tv_time.setText(newsInfo.getPtime());
-        tv_comment_count.setText(String.format(context.getString(R.string.news_netease_comment_count), newsInfo.getCommentCount()));
+        tv_time.setText(NewsUtils.getInstance(context).dateUnitConversion(newsInfo.getPtime()));
+        tv_comment_count.setText(String.format(context.getString(R.string.news_netease_comment_count), NewsUtils.getInstance(context).commentsUnitConversion(newsInfo.getCommentCount())));
         holder.getConvertView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

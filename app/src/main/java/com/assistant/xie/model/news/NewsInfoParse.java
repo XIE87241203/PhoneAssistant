@@ -60,7 +60,7 @@ public class NewsInfoParse {
                             break;
                     }
                     info.setTitle(data.getString("title"));
-                    info.setCommentCount(data.getString("commentCount"));
+                    info.setCommentCount(data.getInt("commentCount"));
                     info.setImgsrc(data.getString("imgsrc"));
                     info.setPtime(data.getString("ptime"));
                     info.setImgsrc3gtype(data.getInt("imgsrc3gtype"));
